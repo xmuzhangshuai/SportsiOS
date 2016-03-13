@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "SMLoginViewController.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +18,18 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    // 主界面 登陆
+    SMLoginViewController *loginViewController = [[SMLoginViewController alloc] init];
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
+    self.window.rootViewController = navigationController;
+
+    // 导航栏全局设置
+    [[UINavigationBar appearance] setBarTintColor:[UIColor blackColor]];
+    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+    
+    [self.window makeKeyAndVisible];
+    
     return YES;
 }
 

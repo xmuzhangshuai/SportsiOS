@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  SMLoginViewController.h
 //  SportsModule
 //
 //  Created by Hjf on 16/3/11.
@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
-
+@interface SMLoginViewController : UIViewController
 
 @end
-
