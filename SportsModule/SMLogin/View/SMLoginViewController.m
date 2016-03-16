@@ -50,10 +50,12 @@
 - (void)UILayout {
     userIdTF.frame = CGRectMake(0, 0, USERID_WIDTH, USERID_HEIGHT);
     userIdTF.center = CGPointMake(USERID_CENTER_X, USERID_CENTER_Y);
+    userIdTF.backgroundColor = [UIColor whiteColor];
     userIdTF.placeholder = @"请输入用户识别码";
     [userIdTF setValue:[UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0] forKeyPath:@"_placeholderLabel.textColor"];
     [SMLoginViewController setTextFieldLeftPadding:userIdTF forWidth:LEFTPADDING];
     userIdTF.layer.borderWidth = 1;
+    userIdTF.layer.borderColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0].CGColor;
     userIdTF.layer.cornerRadius = CORNER_REDIUS;
     
     loginButton.frame = CGRectMake(0, 0, BLACKBUTTON_WIDTH, BLACKBUTTON_HEIGHT);
@@ -88,8 +90,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0];
     [self UILayout];
+    self.extendedLayoutIncludesOpaqueBars = YES;
 }
 
 - (void)didReceiveMemoryWarning {

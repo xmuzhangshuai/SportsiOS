@@ -23,7 +23,7 @@
 #define DETAILSDISTANCE_CENTER_Y    0.47*SCREEN_HEIGHT
 
 #define KBUTTON_CENTER_Y        0.82*SCREEN_HEIGHT
-#define KBUTTON_WIDTH           4*BLACKBUTTON_HEIGHT
+#define KBUTTON_WIDTH           0.274*SCREEN_WIDTH
 
 #define LOGOUTBUTTON_HEIGHT     0.07*SCREEN_HEIGHT
 
@@ -70,6 +70,8 @@
     }
     return self;
 }
+
+
 
 #pragma mark - 导航栏初始化
 - (void)NavigationInit {
@@ -142,17 +144,20 @@
     runButton.frame = CGRectMake(0, 0, 1, 1);
     runButton.center = CGPointMake(CENTER_X, RUNBUTTON_CENTER_Y);
     [runButton setImage:[UIImage imageNamed:@"跑图标"] forState:UIControlStateNormal];
+    [runButton setImage:[UIImage imageNamed:@"跑图标(点击状态)"] forState:UIControlStateHighlighted];
     runButton.backgroundColor = [UIColor clearColor];
     [runButton addTarget:self action:@selector(chooseRun) forControlEvents:UIControlEventTouchUpInside];
     
     walkButton.frame = CGRectMake(0, 0, 1, 1);
     walkButton.center = CGPointMake(CENTER_X, WALKBUTTON_CENTER_Y);
     [walkButton setImage:[UIImage imageNamed:@"走图标"] forState:UIControlStateNormal];
+    [walkButton setImage:[UIImage imageNamed:@"走图标(点击状态)"] forState:UIControlStateHighlighted];
     [walkButton addTarget:self action:@selector(chooseWalk) forControlEvents:UIControlEventTouchUpInside];
     
     bikeButton.frame = CGRectMake(0, 0, 1, 1);
     bikeButton.center = CGPointMake(CENTER_X, BIKEBUTTON_CENTER_Y);
     [bikeButton setImage:[UIImage imageNamed:@"骑图标"] forState:UIControlStateNormal];
+    [bikeButton setImage:[UIImage imageNamed:@"骑图标(点击状态)"] forState:UIControlStateHighlighted];
     [bikeButton addTarget:self action:@selector(chooseBike) forControlEvents:UIControlEventTouchUpInside];
     
     arrowImageView.frame = CGRectMake(0, 0, 1, 1);
@@ -174,7 +179,7 @@
 }
 
 - (void)showMenu {
-    [UIView animateWithDuration:1.0
+    [UIView animateWithDuration:0.5
                           delay:0.0
          usingSpringWithDamping:1.0
           initialSpringVelocity:4.0
@@ -192,7 +197,7 @@
 }
 
 - (void)hiddenMenu {
-    [UIView animateWithDuration:1.0
+    [UIView animateWithDuration:0.5
                           delay:0.0
          usingSpringWithDamping:1.0
           initialSpringVelocity:4.0
@@ -214,21 +219,22 @@
 }
 
 - (void)chooseRun {
-    [runButton setImage:[UIImage imageNamed:@"跑图标(点击状态)"] forState:UIControlStateNormal];
-    SMSportsViewController *sportsViewController = [[SMSportsViewController alloc] init];
+    SMSportsViewController *sportsViewController = [[SMSportsViewController alloc] initWithSport:@"跑"];
     [self.navigationController pushViewController:sportsViewController animated:YES];
 }
 
 - (void)chooseWalk {
-    [walkButton setImage:[UIImage imageNamed:@"走图标(点击状态)"] forState:UIControlStateNormal];
+    SMSportsViewController *sportViewController = [[SMSportsViewController alloc] initWithSport:@"走"];
+    [self.navigationController pushViewController:sportViewController animated:YES];
 }
 
 - (void)chooseBike {
-    [bikeButton setImage:[UIImage imageNamed:@"骑图标(点击状态)"] forState:UIControlStateNormal];
+    SMSportsViewController *sportViewController = [[SMSportsViewController alloc] initWithSport:@"骑"];
+    [self.navigationController pushViewController:sportViewController animated:YES];
 }
 
 - (void)toLoginView {
-    
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)toMyRecord {
@@ -243,7 +249,8 @@
 
 #pragma mark - Life Cycle
 - (void)viewDidLoad {
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0];
     [self UILayout];
+    self.extendedLayoutIncludesOpaqueBars = YES;
 }
 @end

@@ -10,4 +10,6 @@
 
 @interface SMSportsViewController : UIViewController
 
+- (instancetype)initWithSport:(NSString *)sportmode;
+
 @end

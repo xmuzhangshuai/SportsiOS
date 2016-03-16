@@ -227,7 +227,8 @@
 
 #pragma mark - Life Cycle
 - (void)viewDidLoad {
-    self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [UIColor colorWithRed:88/255.0 green:89/255.0 blue:91/255.0 alpha:1.0];
+    self.extendedLayoutIncludesOpaqueBars = YES;
     [self UILayout];
 }
 

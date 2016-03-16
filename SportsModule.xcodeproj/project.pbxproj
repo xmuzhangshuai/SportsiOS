@@ -20,6 +20,7 @@
 		421FEB641C940C9C009F76AA /* SMScoreBoardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB611C940C9C009F76AA /* SMScoreBoardViewController.m */; };
 		421FEB671C946B99009F76AA /* SMMyRecordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB661C946B99009F76AA /* SMMyRecordViewController.m */; };
 		421FEB6C1C9567BD009F76AA /* SMSportsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB6B1C9567BD009F76AA /* SMSportsViewController.m */; };
+		421FEB6F1C96FCA3009F76AA /* HJFSMRTTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB6E1C96FCA3009F76AA /* HJFSMRTTableViewCell.m */; };
 		5861A4F90B436FA6429260C8 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5553653B04258F9B6EA4E6 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -69,6 +70,8 @@
 		421FEB661C946B99009F76AA /* SMMyRecordViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMMyRecordViewController.m; sourceTree = "<group>"; };
 		421FEB6A1C9567BD009F76AA /* SMSportsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMSportsViewController.h; sourceTree = "<group>"; };
 		421FEB6B1C9567BD009F76AA /* SMSportsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMSportsViewController.m; sourceTree = "<group>"; };
+		421FEB6D1C96FCA3009F76AA /* HJFSMRTTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HJFSMRTTableViewCell.h; sourceTree = "<group>"; };
+		421FEB6E1C96FCA3009F76AA /* HJFSMRTTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HJFSMRTTableViewCell.m; sourceTree = "<group>"; };
 		86619961407EC10F3B3CB8DE /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		BF5553653B04258F9B6EA4E6 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA9A0AD74FCA595CF3527CC5 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -324,6 +327,8 @@
 				421FEB5F1C940C9C009F76AA /* HJFSMTableViewCell.m */,
 				421FEB601C940C9C009F76AA /* SMScoreBoardViewController.h */,
 				421FEB611C940C9C009F76AA /* SMScoreBoardViewController.m */,
+				421FEB6D1C96FCA3009F76AA /* HJFSMRTTableViewCell.h */,
+				421FEB6E1C96FCA3009F76AA /* HJFSMRTTableViewCell.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -534,6 +539,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				421FEB6F1C96FCA3009F76AA /* HJFSMRTTableViewCell.m in Sources */,
 				421FEB421C931DEE009F76AA /* SMMainViewController.m in Sources */,
 				421FEB671C946B99009F76AA /* SMMyRecordViewController.m in Sources */,
 				421FEB261C92B07F009F76AA /* main.m in Sources */,

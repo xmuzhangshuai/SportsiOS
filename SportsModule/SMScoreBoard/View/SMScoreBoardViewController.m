@@ -8,6 +8,7 @@
 
 #import "SMScoreBoardViewController.h"
 #import "HJFSMTableViewCell.h"
+#import "HJFSMRTTableViewCell.h"
 #import "UISize.h"
 #import "SMSize.h"
 
@@ -29,10 +30,15 @@
 
 #define RTIMAGEVIEW_X       0.54*SCREEN_WIDTH
 #define RTIMAGEVIEW_Y       STATUS_HEIGHT+NAVIGATIONBAR_HEIGHT+10
-#define RTIMAGEVIEW_WIDTH   0.43*SCREEN_WIDTH
-#define RTIMAGEVIEW_HEIGHT  0.43*SCREEN_WIDTH
+#define RTIMAGEVIEW_WIDTH   0.389*SCREEN_WIDTH
+#define RTIMAGEVIEW_HEIGHT  0.209*SCREEN_HEIGHT
 
-@interface SMScoreBoardViewController() <UITableViewDataSource, UITableViewDelegate>
+#define RTTABLEVIEW_X       0*RTIMAGEVIEW_WIDTH
+#define RTTABLEVIEW_Y       0.111*RTIMAGEVIEW_HEIGHT
+#define RTTABLEVIEW_WIDTH   RTIMAGEVIEW_WIDTH
+#define RTTABLEVIEW_HEIGHT  0.889*RTIMAGEVIEW_HEIGHT
+
+@interface SMScoreBoardViewController() <UITableViewDataSource, UITableViewDelegate, UIGestureRecognizerDelegate>
 @end
 
 @implementation SMScoreBoardViewController {
@@ -40,8 +46,12 @@
     UILabel     *rankLabel;  // 我的排名标签
     UITableView *scoreBoardTableView;   // 积分列表
     UIImageView *rankTimeImageView;     // 排行筛选菜单
+    UITableView *rankTimeTableView;     // 排行筛选列表
+    NSArray     *rankTimeArray;         // 排行筛选选项
     UIView      *cover;                 // 显示菜单时的覆盖层
     UIView      *rightButtonView;       // 日排行按钮
+    NSString    *rankTimeStr;           // 记录当前是什么排行 如果选择当前排行则不需要请求缓存
+    UIButton    *buttonL;               // 显示日排行按钮，设置成成员变量
     NSMutableArray *array;  //测试
 }
 
@@ -51,8 +61,11 @@
         rankLabel           = [[UILabel alloc] init];
         scoreBoardTableView = [[UITableView alloc] init];
         rankTimeImageView   = [[UIImageView alloc] init];
+        rankTimeTableView   = [[UITableView alloc] init];
+        rankTimeArray       = @[@"日排行", @"周排行", @"月排行", @"年排行"];
         cover               = [[UIView alloc] init];
         array = [[NSMutableArray alloc] init];
+        rankTimeStr         = @"日排行";
     }
     return self;
 }
@@ -70,7 +83,7 @@
 //    NSArray *buttonArray = @[rightButtonR, rightButtonL];
 //    self.navigationItem.rightBarButtonItems = buttonArray;
     rightButtonView = [[UIView alloc] initWithFrame:CGRectMake(RIGHTBUTTONVIEW_X, RIGHTBUTTONVIEW_Y, RIGHTBUTTONVIEW_WIDTH, RIGHTBUTTONVIEW_HEIGHT)];
-    UIButton *buttonL = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 0.8*RIGHTBUTTONVIEW_WIDTH, RIGHTBUTTONVIEW_HEIGHT)];
+    buttonL = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 0.8*RIGHTBUTTONVIEW_WIDTH, RIGHTBUTTONVIEW_HEIGHT)];
     [buttonL setTitle:@"日排行" forState:UIControlStateNormal];
     buttonL.titleLabel.font = [UIFont systemFontOfSize:15];
     [buttonL addTarget:self action:@selector(choiceRankTime) forControlEvents:UIControlEventTouchUpInside];
@@ -99,6 +112,7 @@
     rankLabel.textAlignment = NSTextAlignmentCenter;
     
     scoreBoardTableView.frame = CGRectMake(TABLEVIEW_X, TABLEVIEW_Y, TABLEVIEW_WIDTH, TABLEVIEW_HEIGHT);
+    scoreBoardTableView.tag = 0;
     scoreBoardTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     scoreBoardTableView.delegate = self;
     scoreBoardTableView.dataSource = self;
@@ -115,11 +129,21 @@
     cover.alpha = 0;
     cover.hidden = YES;
     UITapGestureRecognizer *menuDismiss = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hiddenRankTimeMenu)];
+    menuDismiss.delegate = self;
     [cover addGestureRecognizer:menuDismiss];
     
     rankTimeImageView.frame = CGRectMake(RTIMAGEVIEW_X, RTIMAGEVIEW_Y, RTIMAGEVIEW_WIDTH, 0);
-//    rankTimeImageView.image = [UIImage imageNamed:@"下拉菜单"];
-    rankTimeImageView.backgroundColor = [UIColor whiteColor];
+    rankTimeImageView.userInteractionEnabled = YES;
+    rankTimeImageView.image = [UIImage imageNamed:@"下拉菜单"];
+    
+    rankTimeTableView.frame = CGRectMake(RTTABLEVIEW_X, RTTABLEVIEW_Y, RTTABLEVIEW_WIDTH, RTTABLEVIEW_HEIGHT);
+    rankTimeTableView.tag = 1;
+    rankTimeTableView.backgroundColor = [UIColor clearColor];
+    rankTimeTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    rankTimeTableView.hidden = YES;
+    rankTimeTableView.delegate = self;
+    rankTimeTableView.dataSource = self;
+    [rankTimeImageView addSubview:rankTimeTableView];
     
     [cover addSubview:rankTimeImageView];
     [self.view addSubview:cover];
@@ -133,36 +157,149 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 7;
+    if (tableView.tag == 0) {
+        return 7;
+    }else {
+        return 4;
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *cellIdentifier=@"UITableViewCellIdentifierKey1";
-    HJFSMTableViewCell *cell;
-    cell=[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if(!cell){
-        cell=[[HJFSMTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+    if (tableView.tag == 0) {
+        static NSString *cellIdentifier=@"UITableViewCellIdentifierKey1";
+        HJFSMTableViewCell *cell;
+        cell=[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        if(!cell){
+            cell=[[HJFSMTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        }
+        cell.score = [array objectAtIndex:indexPath.row];
+        cell.rankLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:16];
+        cell.rankLabel.text = [NSString stringWithFormat:@"%ld", (long)indexPath.row+1];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        if (indexPath.row == 0) {
+            cell.rankImageView.image = [UIImage imageNamed:@"第一名图标"];
+        }else if (indexPath.row == 1) {
+            cell.rankImageView.image = [UIImage imageNamed:@"第二名图标"];
+        }else if (indexPath.row == 2) {
+            cell.rankImageView.image = [UIImage imageNamed:@"第三名图标"];
+        }
+        
+        return cell;
+    }else {
+        static NSString *cellIdentifier = @"UITableViewCellIdentifierKey2";
+        HJFSMRTTableViewCell *cell;
+        cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        if (!cell) {
+            cell = [[HJFSMRTTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        }
+        if (!(indexPath.row == 3)) {
+            cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"下拉菜单分割线"]];
+        }
+        cell.backgroundView.contentMode = UIViewContentModeBottom;
+        cell.textLabel.text = [rankTimeArray objectAtIndex:indexPath.row];
+        cell.backgroundColor = [UIColor clearColor];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        if (indexPath.row == 0) {
+            cell.imageView.image = [UIImage imageNamed:@"选中状态图标"];
+        }else {
+            cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
+        }
+        
+        return cell;
     }
-    cell.score = [array objectAtIndex:indexPath.row];
-    cell.rankLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:16];
-    cell.rankLabel.text = [NSString stringWithFormat:@"%ld", (long)indexPath.row+1];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    if (indexPath.row == 0) {
-        cell.rankImageView.image = [UIImage imageNamed:@"第一名图标"];
-    }else if (indexPath.row == 1) {
-        cell.rankImageView.image = [UIImage imageNamed:@"第二名图标"];
-    }else if (indexPath.row == 2) {
-        cell.rankImageView.image = [UIImage imageNamed:@"第三名图标"];
-    }
-    
-    return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    HJFSMTableViewCell *cell = [[HJFSMTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@""];
-    cell.score = [[HJFSMScore alloc] init];
-    NSLog(@"%f", cell.height);
-    return cell.height;
+    if (tableView.tag == 0) {
+        HJFSMTableViewCell *cell = [[HJFSMTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@""];
+        cell.score = [[HJFSMScore alloc] init];
+        return cell.height;
+    }else {
+        return 0.045*SCREEN_HEIGHT;
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (tableView.tag == 1) {
+        if (indexPath.row == 0) {
+            if (![rankTimeStr isEqualToString:@"日排行"]) {
+                // 更新积分榜 日排行
+                HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+                cell.imageView.image = [UIImage imageNamed:@"选中状态图标"];
+                [buttonL setTitle:@"日排行" forState:UIControlStateNormal];
+                rankTimeStr = @"日排行";
+                // 设置其他图标为未选中图标
+                for (int i = 0; i < 4; i++) {
+                    NSIndexPath *myIndexPath = [NSIndexPath indexPathForRow:i inSection:0];
+                    if (!(myIndexPath.row == indexPath.row)) {
+                        NSLog(@"未选中");
+                        HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:myIndexPath];
+                        cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
+                    }
+                }
+            }
+        }else if (indexPath.row == 1) {
+            if (![rankTimeStr isEqualToString:@"周排行"]) {
+                // 更新积分榜 周排行
+                HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+                cell.imageView.image = [UIImage imageNamed:@"选中状态图标"];
+                [buttonL setTitle:@"周排行" forState:UIControlStateNormal];
+                rankTimeStr = @"周排行";
+                // 设置其他图标为未选中图标
+                for (int i = 0; i < 4; i++) {
+                    NSIndexPath *myIndexPath = [NSIndexPath indexPathForRow:i inSection:0];
+                    if (!(myIndexPath.row == indexPath.row)) {
+                        NSLog(@"未选中");
+                        HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:myIndexPath];
+                        cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
+                    }
+                }
+            }
+        }else if (indexPath.row == 2) {
+            if (![rankTimeStr isEqualToString:@"月排行"]) {
+                // 更新积分榜 月排行
+                HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+                cell.imageView.image = [UIImage imageNamed:@"选中状态图标"];
+                [buttonL setTitle:@"月排行" forState:UIControlStateNormal];
+                rankTimeStr = @"月排行";
+                // 设置其他图标为未选中图标
+                for (int i = 0; i < 4; i++) {
+                    NSIndexPath *myIndexPath = [NSIndexPath indexPathForRow:i inSection:0];
+                    if (!(myIndexPath.row == indexPath.row)) {
+                        NSLog(@"未选中");
+                        HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:myIndexPath];
+                        cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
+                    }
+                }
+            }
+        }else if (indexPath.row == 3) {
+            if (![rankTimeStr isEqualToString:@"年排行"]) {
+                // 更新积分榜 年排行
+                HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+                cell.imageView.image = [UIImage imageNamed:@"选中状态图标"];
+                [buttonL setTitle:@"年排行" forState:UIControlStateNormal];
+                rankTimeStr = @"年排行";
+                // 设置其他图标为未选中图标
+                for (int i = 0; i < 4; i++) {
+                    NSIndexPath *myIndexPath = [NSIndexPath indexPathForRow:i inSection:0];
+                    if (!(myIndexPath.row == indexPath.row)) {
+                        NSLog(@"未选中");
+                        HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:myIndexPath];
+                        cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
+                    }
+                }
+            }
+        }
+        [self hiddenRankTimeMenu];
+    }
+}
+
+#pragma mark - UIGesture代理
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if ([NSStringFromClass([touch.view class]) isEqualToString:@"UITableViewCellContentView"]) {
+        return NO;
+    }
+    return YES;
 }
 
 #pragma mark - 私有方法
@@ -178,7 +315,7 @@
     CGRect imageRect = rankTimeImageView.frame;
     imageRect.size.height = RTIMAGEVIEW_HEIGHT;
     imageRect.size.width = RTIMAGEVIEW_WIDTH;
-    [UIView animateWithDuration:1.0f
+    [UIView animateWithDuration:0.5f
                           delay:0.05f
          usingSpringWithDamping:1.0
           initialSpringVelocity:4.0
@@ -189,6 +326,7 @@
                          rankTimeImageView.frame = imageRect;
                      }
                      completion:^(BOOL finished){
+                         rankTimeTableView.hidden = NO;
                      }];
     [UIView commitAnimations];
 }
@@ -197,12 +335,13 @@
     CGRect imageRect = rankTimeImageView.frame;
     imageRect.size.width = RTIMAGEVIEW_WIDTH;
     imageRect.size.height = 0;
-    [UIView animateWithDuration:1.0f
+    [UIView animateWithDuration:0.5f
                           delay:0.05f
          usingSpringWithDamping:1.0
           initialSpringVelocity:4.0
                         options: UIViewAnimationOptionCurveEaseInOut
                      animations:^{
+                         rankTimeTableView.hidden = YES;
                          rankTimeImageView.frame = imageRect;
                          cover.alpha = 0;
                      }
@@ -213,7 +352,8 @@
 }
 
 - (void)viewDidLoad {
-    self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [UIColor colorWithRed:88/255.0 green:89/255.0 blue:91/255.0 alpha:1.0];
+    self.extendedLayoutIncludesOpaqueBars = YES;
     [self UILayout];
     for (int i = 0; i < 7; i++) {
         NSDictionary *dic = @{@"userName":@"张三",@"userScore":@"1234"};

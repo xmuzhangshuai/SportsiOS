@@ -26,6 +26,7 @@
 
     // 导航栏全局设置
     [[UINavigationBar appearance] setBarTintColor:[UIColor blackColor]];
+    [UINavigationBar appearance].translucent = NO;
     [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
     
     [self.window makeKeyAndVisible];

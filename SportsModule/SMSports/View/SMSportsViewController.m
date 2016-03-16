@@ -38,10 +38,12 @@
 #define STOPIMAGEVIEW_WIDTH    0.653*SCREEN_WIDTH
 #define STOPIMAGEVIEW_HEIGHT   0.213*SCREEN_HEIGHT
 
-#define BEENFINISHLABEL_X       0
-#define BEENFINISHLABEL_Y       STOPIMAGEVIEW_HEIGHT*0/3
-#define BEENFINISHLABEL_WIDTH   STOPIMAGEVIEW_WIDTH
-#define BEENFINISHLABEL_HEIGHT  STOPIMAGEVIEW_HEIGHT
+#define BEENFINISHLABEL_CENTER_X    0.336*SCREEN_WIDTH
+#define BEENFINISHLABEL_CENTER_Y    0.473*SCREEN_HEIGHT
+#define BEENFINISHLABEL_WIDTH   0.653*SCREEN_WIDTH/2
+#define BEENFINISHLABEL_HEIGHT  0.213*SCREEN_HEIGHT/3
+
+#define SUCCESSFINISHLABEL_CENTER_X 0.662*SCREEN_WIDTH
 
 #define CONFIRMBUTTON_CENTER_Y  0.623*SCREEN_HEIGHT
 #define CONFIRMBUTTON_WIDTH     0.12*SCREEN_WIDTH
@@ -74,6 +76,8 @@
     UILabel     *successFinishLabel;    // 成功完成
     UIButton    *confirmButton;         // 确定按钮
     UIButton    *continueButton;        // 继续按钮
+    
+    NSString    *sportMode;             // 记录运动方式
 }
 
 @end
@@ -107,6 +111,34 @@
     return self;
 }
 
+- (instancetype)initWithSport:(NSString *)sportmode {
+    if (self = [super init]) {
+        titleView           = [[UIView alloc] init];
+        detailsView         = [[UIImageView alloc] init];
+        startTimeImageView  = [[UIImageView alloc] init];
+        usedTimeImageView   = [[UIImageView alloc] init];
+        distanceImageView   = [[UIImageView alloc] init];
+        startTimeLabel      = [[UILabel alloc] init];
+        usedTimeLabel       = [[UILabel alloc] init];
+        distanceLabel       = [[UILabel alloc] init];
+        cutLineViewL        = [[UIView alloc] init];
+        cutLineViewR        = [[UIView alloc] init];
+        switchButton        = [[UIButton alloc] init];
+        sportImageView      = [[UIImageView alloc] init];
+        switchMenu          = YES;
+        
+        cover               = [[UIView alloc] init];
+        stopImageView       = [[UIImageView alloc] init];
+        beenFinishLabel     = [[UILabel alloc] init];
+        successFinishLabel  = [[UILabel alloc] init];
+        confirmButton       = [[UIButton alloc] init];
+        continueButton      = [[UIButton alloc] init];
+        
+        sportMode           = sportmode;
+    }
+    return self;
+}
+
 #pragma mark - 导航栏设置
 - (void)NavigationInit {
     UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"返回图标"] style:UIBarButtonItemStylePlain target:self action:@selector(backToMainView)];
@@ -135,6 +167,7 @@
     
     // 设置半透明图
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"透明"] forBarMetrics:UIBarMetricsDefault];
+    self.navigationController.navigationBar.translucent = YES;
     
     // 去掉navigationbar底部黑线
     [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
@@ -144,8 +177,8 @@
 - (void)UILayout {
     // 外层view
     detailsView.frame = CGRectMake(DETAILSVIEW_X, DETAILSVIEW_Y, DETAILSVIEW_WIDTH, 0);
-//    detailsView.image = [UIImage imageNamed:@"透明"];
-    detailsView.backgroundColor = [UIColor greenColor];
+    detailsView.image = [UIImage imageNamed:@"半透明"];
+//    detailsView.backgroundColor = [UIColor greenColor];
     [self hiddenUI];
     
     // 时间记录标签
@@ -208,15 +241,21 @@
     // 开始\暂停按钮
     switchButton.frame = CGRectMake(0, 0, SWITCHBUTTON_WIDTH, SWITCHBUTTON_WIDTH);
     switchButton.center = CGPointMake(CENTER_X, SWITCHBUTTON_CENTER_Y);
-    [switchButton setImage:[UIImage imageNamed:@"开始图标"] forState:UIControlStateNormal];
-    [switchButton addTarget:self action:@selector(showStopMenu) forControlEvents:UIControlEventTouchUpInside];
+    [switchButton setImage:[UIImage imageNamed:@"暂停图标"] forState:UIControlStateNormal];
+    [switchButton addTarget:self action:@selector(stopSport) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:switchButton];
     
     // 运动类型标签
     sportImageView.frame = CGRectMake(0, 0, SPORTIMAGEVIEW_WIDTH, SPORTIMAGEVIEW_WIDTH);
     sportImageView.center = CGPointMake(CENTER_X, SPORTIMAGEVIEW_CENTER_Y);
-    // 需要传参判断要什么图标
-    sportImageView.image = [UIImage imageNamed:@"跑步类型图标"];
+    if ([sportMode isEqualToString:@"跑"]) {
+        sportImageView.image = [UIImage imageNamed:@"跑步类型图标"];
+    }else if ([sportMode isEqualToString:@"走"]) {
+        sportImageView.image = [UIImage imageNamed:@"步行类型图标"];
+    }else {
+        sportImageView.image = [UIImage imageNamed:@"骑行类型图标"];
+    }
+
     [self.view addSubview:sportImageView];
     
     // 暂停界面
@@ -224,8 +263,8 @@
     cover.alpha = 0;
     cover.backgroundColor = [UIColor blackColor];
     cover.hidden = YES;
-    UITapGestureRecognizer *hiddenStopMenu = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hiddenStopMenu)];
-    [cover addGestureRecognizer:hiddenStopMenu];
+    UITapGestureRecognizer *continueSportMenu = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(continueSport)];
+    [cover addGestureRecognizer:continueSportMenu];
     [self.view addSubview:cover];
     
     stopImageView.frame = CGRectMake(0, 0, 1, 1);
@@ -233,27 +272,30 @@
     [stopImageView setImage:[UIImage imageNamed:@"背景底图"]];
     [cover addSubview:stopImageView];
     
-    beenFinishLabel.frame = CGRectMake(BEENFINISHLABEL_X, BEENFINISHLABEL_Y, BEENFINISHLABEL_WIDTH, BEENFINISHLABEL_HEIGHT);
+    beenFinishLabel.frame = CGRectMake(0, 0, BEENFINISHLABEL_WIDTH, BEENFINISHLABEL_HEIGHT);
+    beenFinishLabel.center = CGPointMake(BEENFINISHLABEL_CENTER_X, BEENFINISHLABEL_CENTER_Y);
     beenFinishLabel.text = @"12.00";
     beenFinishLabel.textAlignment = NSTextAlignmentCenter;
-//    beenFinishLabel.hidden = YES;
-    beenFinishLabel.backgroundColor = [UIColor redColor];
-    [stopImageView addSubview:beenFinishLabel];
+    beenFinishLabel.hidden = YES;
+    [cover addSubview:beenFinishLabel];
     
-    successFinishLabel.frame = CGRectMake(BEENFINISHLABEL_X+BEENFINISHLABEL_WIDTH, BEENFINISHLABEL_Y, BEENFINISHLABEL_WIDTH, BEENFINISHLABEL_HEIGHT);
+    successFinishLabel.frame = CGRectMake(0, 0, BEENFINISHLABEL_WIDTH, BEENFINISHLABEL_HEIGHT);
+    successFinishLabel.center = CGPointMake(SUCCESSFINISHLABEL_CENTER_X, BEENFINISHLABEL_CENTER_Y);
     successFinishLabel.text = @"1300";
     successFinishLabel.textAlignment = NSTextAlignmentCenter;
     successFinishLabel.hidden = YES;
-    [stopImageView addSubview:successFinishLabel];
+    [cover addSubview:successFinishLabel];
     
     confirmButton.frame = CGRectMake(0, 0, 1, 1);
     confirmButton.center = CGPointMake(CENTER_X, CONFIRMBUTTON_CENTER_Y);
     [confirmButton setImage:[UIImage imageNamed:@"确定图标"] forState:UIControlStateNormal];
+    [confirmButton addTarget:self action:@selector(doneSport) forControlEvents:UIControlEventTouchUpInside];
     [cover addSubview:confirmButton];
     
     continueButton.frame = CGRectMake(0, 0, 1, 1);
     continueButton.center = CGPointMake(CENTER_X, CONTINUEBUTTON_CENTER_Y);
     [continueButton setImage:[UIImage imageNamed:@"继续图标"] forState:UIControlStateNormal];
+    [continueButton addTarget:self action:@selector(continueSport) forControlEvents:UIControlEventTouchUpInside];
     [cover addSubview:continueButton];
     
     [self NavigationInit];
@@ -269,7 +311,7 @@
     CGRect viewRect = detailsView.frame;
     if (switchMenu) {
         viewRect.size.height = DETAILSVIEW_HEIGHT;
-        [UIView animateWithDuration:1.0
+        [UIView animateWithDuration:0.5
                               delay:0.0
              usingSpringWithDamping:1.0
               initialSpringVelocity:4.0
@@ -285,7 +327,7 @@
     }else if (!switchMenu) {
         viewRect.size.height = 0;
         [self hiddenUI];
-        [UIView animateWithDuration:1.0
+        [UIView animateWithDuration:0.5
                               delay:0.0
              usingSpringWithDamping:1.0
               initialSpringVelocity:4.0
@@ -322,16 +364,25 @@
     cutLineViewR.hidden = YES;
 }
 
+// 暂停运动 显示暂停菜单
 - (void)stopSport {
-    
+    [self showStopMenu];
+    [switchButton setImage:[UIImage imageNamed:@"开始图标"] forState:UIControlStateNormal];
 }
 
+// 继续运动 隐藏暂停菜单
 - (void)continueSport {
-    
+    [self hiddenStopMenu];
+    [switchButton setImage:[UIImage imageNamed:@"暂停图标"] forState:UIControlStateNormal];
+}
+
+// 完成运动
+- (void)doneSport {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)showStopMenu {
-    [UIView animateWithDuration:1.0
+    [UIView animateWithDuration:0.5
                           delay:0.0
          usingSpringWithDamping:1.0
           initialSpringVelocity:4.0
@@ -353,7 +404,7 @@
 - (void)hiddenStopMenu {
     beenFinishLabel.hidden = YES;
     successFinishLabel.hidden = YES;
-    [UIView animateWithDuration:1.0
+    [UIView animateWithDuration:0.5
                           delay:0.0
          usingSpringWithDamping:1.0
           initialSpringVelocity:4.0
@@ -373,12 +424,17 @@
 #pragma mark - Life Cycle
 - (void)viewDidLoad {
     self.view.backgroundColor = [UIColor grayColor];
+    // 地图图片测试
+    UIImageView *testMapImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"地图测试图片"]];
+    testMapImage.frame = [UIScreen mainScreen].bounds;
+    [self.view addSubview:testMapImage];
     [self UILayout];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [detailsView removeFromSuperview];
+    self.navigationController.navigationBar.translucent = NO;
 }
 
 @end
