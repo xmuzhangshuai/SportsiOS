@@ -12,6 +12,9 @@
 #import "UISize.h"
 #import "SMSize.h"
 
+#pragma mark - LeanCloud
+#import "AVOSCloud/AVOSCloud.h"
+
 #define TIMELABEL_X         0
 #define TIMELABEL_Y         STATUS_HEIGHT+NAVIGATIONBAR_HEIGHT
 #define TIMELABEL_HEIGHT    0.03*SCREEN_HEIGHT
@@ -360,6 +363,14 @@
         HJFSMScore *score = [[HJFSMScore alloc] initWithDict:dic];
         [array addObject:score];
     }
+    
+    NSNumber *typeNumber = [[NSNumber alloc] initWithInt:1];
+    NSNumber *unitNumber = [[NSNumber alloc] initWithInt:1];
+    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:typeNumber, @"type", unitNumber, @"unit" , nil];
+    NSLog(@"%@", dict);
+    [AVCloud callFunctionInBackground:@"GetUserTopList" withParameters:dict block:^(id object, NSError *error) {
+        NSLog(@"积分榜信息：%@  错误信息：%@", object, error);
+    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

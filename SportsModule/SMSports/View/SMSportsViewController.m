@@ -10,6 +10,12 @@
 #import "UISize.h"
 #import "SMSize.h"
 
+#pragma mark - 百度地图
+#import <BaiduMapAPI_Map/BMKMapComponent.h>
+#import <BaiduMapAPI_Location/BMKLocationComponent.h>
+#import <BaiduMapAPI_Base/BMKBaseComponent.h>
+#import <BaiduMapAPI_Utils/BMKUtilsComponent.h>
+
 #define DETAILSVIEW_X   0
 #define DETAILSVIEW_Y   NAVIGATIONBAR_HEIGHT
 #define DETAILSVIEW_WIDTH   SCREEN_WIDTH
@@ -50,7 +56,26 @@
 
 #define CONTINUEBUTTON_CENTER_Y 0.725*SCREEN_HEIGHT
 
-@interface SMSportsViewController() {
+@interface SMSportsViewController() <BMKMapViewDelegate, BMKLocationServiceDelegate>
+
+/** 上一次的位置 */
+@property (nonatomic, strong) CLLocation *preLocation;
+
+/** 位置数组 */
+@property (nonatomic, strong) NSMutableArray *locationArray;
+
+/** 轨迹线 */
+@property (nonatomic, strong) BMKPolyline *polyLine;
+
+/** 百度地图View */
+@property (nonatomic, strong) BMKMapView *mapView;
+
+/** 百度定位地图服务 */
+@property (nonatomic, strong) BMKLocationService *bmkLocationService;
+
+@end
+
+@implementation SMSportsViewController {
     UIView *titleView;  // 运行详情view
     UIImageView *detailsView;    // 运动详细时间距离容器
     
@@ -79,10 +104,6 @@
     
     NSString    *sportMode;             // 记录运动方式
 }
-
-@end
-
-@implementation SMSportsViewController
 
 - (id)init {
     if (self = [super init]) {
@@ -166,7 +187,7 @@
     [self.navigationItem.titleView addGestureRecognizer:showMenuTap];
     
     // 设置半透明图
-    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"透明"] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"半透明"] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.translucent = YES;
     
     // 去掉navigationbar底部黑线
@@ -299,7 +320,159 @@
     [cover addSubview:continueButton];
     
     [self NavigationInit];
+    
+    // 百度地图模块
+    [self BMKMapInit];
+    [_bmkLocationService startUserLocationService];
+    BMKCoordinateRegion adjustRegion = [self.mapView regionThatFits:BMKCoordinateRegionMake(self.bmkLocationService.userLocation.location.coordinate, BMKCoordinateSpanMake(0.02f,0.02f))];
+    [self.mapView setRegion:adjustRegion animated:YES];
 }
+
+#pragma mark - 百度地图设置
+/*
+ *  百度地图初始化
+ */
+- (void)BMKMapInit {
+    // 初始化百度位置服务
+    [self BMKLocationServiceInit];
+    self.mapView = [[BMKMapView alloc] initWithFrame:self.view.bounds];
+    [self setMapViewProperty];
+    [self.view insertSubview:self.mapView atIndex:0];
+}
+
+/**
+ *  设置百度mapview的一些属性
+ */
+- (void)setMapViewProperty {
+    self.mapView.showsUserLocation = YES;
+    self.mapView.userTrackingMode = BMKUserTrackingModeNone;
+    self.mapView.rotateEnabled = YES;
+    self.mapView.showMapScaleBar = YES;
+    self.mapView.mapScaleBarPosition = CGPointMake(self.view.frame.size.width-50, self.view.frame.size.height-50);
+    
+    // 定位图层自定义样式参数
+    BMKLocationViewDisplayParam *displayParam = [[BMKLocationViewDisplayParam alloc] init];
+    displayParam.isRotateAngleValid = NO;   //  跟随态旋转角度是否生效
+    displayParam.isAccuracyCircleShow = NO; //  精度圈显示
+    displayParam.locationViewOffsetX = NO;  //  定位偏移量（经度
+    displayParam.locationViewOffsetY = NO;  //  定位偏移量（维度
+    displayParam.locationViewImgName = @"MOVE";
+    [self.mapView updateLocationViewWithParam:displayParam];
+}
+
+/*
+ *  初始化百度位置服务
+ */
+- (void)BMKLocationServiceInit {
+    self.bmkLocationService = [[BMKLocationService alloc] init];
+    // 距离过滤， 表示每移动多少距离更新一次位置
+    _bmkLocationService.distanceFilter = 10;
+    // 设置定位精度
+    _bmkLocationService.desiredAccuracy = kCLLocationAccuracyBest;
+}
+
+#pragma mark - 百度地图代理方法
+/**
+ *  定位失败调用该方法
+ *
+ */
+- (void)didFailToLocateUserWithError:(NSError *)error {
+    NSLog(@"定位失败：%@", error);
+}
+
+/**
+ *  位置更新后，调用此函数
+ *  @param userLocation 新的用户位置
+ */
+- (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation {
+    NSLog(@"新的用户位置");
+    if (userLocation.location.horizontalAccuracy > kCLLocationAccuracyNearestTenMeters) {
+        NSLog(@"水平精准度大于10米");
+    }
+}
+
+/**
+ *  用户方向更新后 调用此函数
+ *  @param userlocation 新的用户位置
+ */
+- (void)didUpdateUserHeading:(BMKUserLocation *)userLocation {
+    [self.mapView updateLocationData:userLocation];
+}
+
+/**
+ *  开始记录轨迹
+ *  @param userLocation 实时更新的位置信息
+ */
+- (void)recordTrackingWithUserLocation:(BMKUserLocation *)userLocation {
+    if (self.preLocation) {
+        CGFloat distance = [userLocation.location distanceFromLocation:self.preLocation];
+        NSLog(@"与上一位置点的距离为%f", distance);
+        if (distance < 5) {
+            return;
+        }
+    }
+    [self.locationArray addObject:userLocation.location];
+    self.preLocation = (CLLocation *)userLocation;
+    
+    [self drawWalkPolyline];
+}
+
+/*
+ *  绘制轨迹路线
+ */
+- (void)drawWalkPolyline {
+    NSInteger count = self.locationArray.count;
+    BMKMapPoint *tempPoints = new BMKMapPoint[count];
+    
+    [self.locationArray enumerateObjectsUsingBlock:^(CLLocation *location, NSUInteger idx, BOOL *stop) {
+        BMKMapPoint locationPoint = BMKMapPointForCoordinate(location.coordinate);
+        tempPoints[idx] = locationPoint;
+    }];
+    
+    if (self.polyLine) {
+        [self.mapView addOverlay:self.polyLine];
+    }
+    
+    delete []tempPoints;
+    
+    [self mapViewFitPolyLine:self.polyLine];
+}
+
+/**
+ *  根据polyline设置地图范围
+ *
+ *  @param polyLine
+ */
+- (void)mapViewFitPolyLine:(BMKPolyline *) polyLine {
+    CGFloat ltX, ltY, rbX, rbY;
+    if (polyLine.pointCount < 1) {
+        return;
+    }
+    BMKMapPoint pt = polyLine.points[0];
+    ltX = pt.x, ltY = pt.y;
+    rbX = pt.x, rbY = pt.y;
+    for (int i = 1; i < polyLine.pointCount; i++) {
+        BMKMapPoint pt = polyLine.points[i];
+        if (pt.x < ltX) {
+            ltX = pt.x;
+        }
+        if (pt.x > rbX) {
+            rbX = pt.x;
+        }
+        if (pt.y > ltY) {
+            ltY = pt.y;
+        }
+        if (pt.y < rbY) {
+            rbY = pt.y;
+        }
+    }
+    BMKMapRect rect;
+    rect.origin = BMKMapPointMake(ltX , ltY);
+    rect.size = BMKMapSizeMake(rbX - ltX, rbY - ltY);
+    [self.mapView setVisibleMapRect:rect];
+    self.mapView.zoomLevel = self.mapView.zoomLevel - 0.3;
+}
+
 
 #pragma mark - 私有方法
 - (void)backToMainView {
@@ -425,9 +598,9 @@
 - (void)viewDidLoad {
     self.view.backgroundColor = [UIColor grayColor];
     // 地图图片测试
-    UIImageView *testMapImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"地图测试图片"]];
-    testMapImage.frame = [UIScreen mainScreen].bounds;
-    [self.view addSubview:testMapImage];
+//    UIImageView *testMapImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"地图测试图片"]];
+//    testMapImage.frame = [UIScreen mainScreen].bounds;
+//    [self.view addSubview:testMapImage];
     [self UILayout];
 }
 

@@ -9,7 +9,15 @@
 #import "AppDelegate.h"
 #import "SMLoginViewController.h"
 
-@interface AppDelegate ()
+#pragma mark - LeanCloud
+#import <AVOSCloud/AVOSCloud.h>
+
+#pragma mark - 百度地图
+#import <BaiduMapAPI_Base/BMKBaseComponent.h>
+
+@interface AppDelegate () <BMKGeneralDelegate>
+
+@property (nonatomic, strong) BMKMapManager *mapManager;
 
 @end
 
@@ -18,11 +26,22 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    // LeanCloud ID设置
+    [AVOSCloud setApplicationId:@"WGUoySgrc7k8FVz2dvWNkJAd-gzGzoHsz" clientKey:@"vHarYvaUm7SuGQQSoOFGVA4m"];
+    
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     // 主界面 登陆
     SMLoginViewController *loginViewController = [[SMLoginViewController alloc] init];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:loginViewController];
     self.window.rootViewController = navigationController;
+    
+    // 百度地图实例化
+    self.mapManager = [[BMKMapManager alloc] init];
+    BOOL ret = [self.mapManager start:@"6uqF5fg6mZkR9Zx1kghU8D83" generalDelegate:self];
+    if (!ret) {
+        NSLog(@"manager start failed");
+    }
 
     // 导航栏全局设置
     [[UINavigationBar appearance] setBarTintColor:[UIColor blackColor]];
@@ -54,6 +73,23 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+#pragma mark - 百度地图代理
+- (void)onGetNetworkState:(int)iError {
+    if (0 == iError) {
+        NSLog(@"联网成功");
+    }else {
+        NSLog(@"state: %d", iError);
+    }
+}
+
+- (void)onGetPermissionState:(int)iError {
+    if (0 == iError) {
+        NSLog(@"授权成功");
+    }else {
+        NSLog(@"Pstate: %d", iError);
+    }
 }
 
 @end
