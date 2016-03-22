@@ -607,7 +607,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [detailsView removeFromSuperview];
-    self.navigationController.navigationBar.translucent = NO;
+    [UINavigationBar appearance].translucent = NO;
 }
 
 @end
