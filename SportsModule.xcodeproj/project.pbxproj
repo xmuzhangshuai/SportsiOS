@@ -13,13 +13,8 @@
 		421FEB241C92B07F009F76AA /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 421FEB1D1C92B07F009F76AA /* Info.plist */; };
 		421FEB251C92B07F009F76AA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB201C92B07F009F76AA /* AppDelegate.m */; };
 		421FEB261C92B07F009F76AA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB221C92B07F009F76AA /* main.m */; };
-		421FEB421C931DEE009F76AA /* SMMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB411C931DEE009F76AA /* SMMainViewController.m */; };
-		421FEB471C931DF5009F76AA /* SMLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB461C931DF5009F76AA /* SMLoginViewController.m */; };
 		421FEB621C940C9C009F76AA /* HJFSMScore.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB5C1C940C9C009F76AA /* HJFSMScore.m */; };
 		421FEB631C940C9C009F76AA /* HJFSMTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB5F1C940C9C009F76AA /* HJFSMTableViewCell.m */; };
-		421FEB641C940C9C009F76AA /* SMScoreBoardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB611C940C9C009F76AA /* SMScoreBoardViewController.m */; };
-		421FEB671C946B99009F76AA /* SMMyRecordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB661C946B99009F76AA /* SMMyRecordViewController.m */; };
-		421FEB6C1C9567BD009F76AA /* SMSportsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB6B1C9567BD009F76AA /* SMSportsViewController.m */; };
 		421FEB6F1C96FCA3009F76AA /* HJFSMRTTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 421FEB6E1C96FCA3009F76AA /* HJFSMRTTableViewCell.m */; };
 		42E4CB381C9FF04E00BF5DB7 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E4CB371C9FF04E00BF5DB7 /* CoreLocation.framework */; };
 		42E4CB3A1C9FF05B00BF5DB7 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E4CB391C9FF05B00BF5DB7 /* QuartzCore.framework */; };
@@ -31,6 +26,11 @@
 		42E4CB651CA04A1B00BF5DB7 /* libstdc++.6.0.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E4CB641CA04A1B00BF5DB7 /* libstdc++.6.0.9.tbd */; };
 		42E4CB6B1CA0E28700BF5DB7 /* HJFActivityIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 42E4CB6A1CA0E28700BF5DB7 /* HJFActivityIndicatorView.m */; };
 		42E4CB6F1CA18B9100BF5DB7 /* mapapi.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 42E4CB6E1CA18B9100BF5DB7 /* mapapi.bundle */; };
+		42F080341CA26B1F00AF4C07 /* SMMyRecordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F080331CA26B1F00AF4C07 /* SMMyRecordViewController.m */; };
+		42F080371CA26B2700AF4C07 /* SMScoreBoardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F080361CA26B2700AF4C07 /* SMScoreBoardViewController.m */; };
+		42F0803A1CA26B3100AF4C07 /* SMLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F080391CA26B3100AF4C07 /* SMLoginViewController.m */; };
+		42F0803D1CA26B3D00AF4C07 /* SMMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F0803C1CA26B3D00AF4C07 /* SMMainViewController.m */; };
+		42F080401CA26B4600AF4C07 /* SMSportsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F0803F1CA26B4600AF4C07 /* SMSportsViewController.m */; };
 		5861A4F90B436FA6429260C8 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5553653B04258F9B6EA4E6 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -66,20 +66,10 @@
 		421FEB221C92B07F009F76AA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		421FEB361C9304AB009F76AA /* UISize.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UISize.h; sourceTree = "<group>"; };
 		421FEB381C931759009F76AA /* SMSize.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SMSize.h; sourceTree = "<group>"; };
-		421FEB401C931DEE009F76AA /* SMMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMMainViewController.h; sourceTree = "<group>"; };
-		421FEB411C931DEE009F76AA /* SMMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMMainViewController.m; sourceTree = "<group>"; };
-		421FEB451C931DF5009F76AA /* SMLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMLoginViewController.h; sourceTree = "<group>"; };
-		421FEB461C931DF5009F76AA /* SMLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMLoginViewController.m; sourceTree = "<group>"; };
 		421FEB5B1C940C9C009F76AA /* HJFSMScore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HJFSMScore.h; sourceTree = "<group>"; };
 		421FEB5C1C940C9C009F76AA /* HJFSMScore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HJFSMScore.m; sourceTree = "<group>"; };
 		421FEB5E1C940C9C009F76AA /* HJFSMTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HJFSMTableViewCell.h; sourceTree = "<group>"; };
 		421FEB5F1C940C9C009F76AA /* HJFSMTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HJFSMTableViewCell.m; sourceTree = "<group>"; };
-		421FEB601C940C9C009F76AA /* SMScoreBoardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMScoreBoardViewController.h; sourceTree = "<group>"; };
-		421FEB611C940C9C009F76AA /* SMScoreBoardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMScoreBoardViewController.m; sourceTree = "<group>"; };
-		421FEB651C946B99009F76AA /* SMMyRecordViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMMyRecordViewController.h; sourceTree = "<group>"; };
-		421FEB661C946B99009F76AA /* SMMyRecordViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMMyRecordViewController.m; sourceTree = "<group>"; };
-		421FEB6A1C9567BD009F76AA /* SMSportsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMSportsViewController.h; sourceTree = "<group>"; };
-		421FEB6B1C9567BD009F76AA /* SMSportsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMSportsViewController.m; sourceTree = "<group>"; };
 		421FEB6D1C96FCA3009F76AA /* HJFSMRTTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HJFSMRTTableViewCell.h; sourceTree = "<group>"; };
 		421FEB6E1C96FCA3009F76AA /* HJFSMRTTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HJFSMRTTableViewCell.m; sourceTree = "<group>"; };
 		42E4CB371C9FF04E00BF5DB7 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -93,6 +83,16 @@
 		42E4CB691CA0E28700BF5DB7 /* HJFActivityIndicatorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HJFActivityIndicatorView.h; sourceTree = "<group>"; };
 		42E4CB6A1CA0E28700BF5DB7 /* HJFActivityIndicatorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HJFActivityIndicatorView.m; sourceTree = "<group>"; };
 		42E4CB6E1CA18B9100BF5DB7 /* mapapi.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = mapapi.bundle; path = ../../Pods/BaiduMapKit/BaiduMapKit/BaiduMapAPI_Map.framework/Resources/mapapi.bundle; sourceTree = "<group>"; };
+		42F080321CA26B1F00AF4C07 /* SMMyRecordViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMMyRecordViewController.h; sourceTree = "<group>"; };
+		42F080331CA26B1F00AF4C07 /* SMMyRecordViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMMyRecordViewController.m; sourceTree = "<group>"; };
+		42F080351CA26B2700AF4C07 /* SMScoreBoardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMScoreBoardViewController.h; sourceTree = "<group>"; };
+		42F080361CA26B2700AF4C07 /* SMScoreBoardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMScoreBoardViewController.m; sourceTree = "<group>"; };
+		42F080381CA26B3100AF4C07 /* SMLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMLoginViewController.h; sourceTree = "<group>"; };
+		42F080391CA26B3100AF4C07 /* SMLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMLoginViewController.m; sourceTree = "<group>"; };
+		42F0803B1CA26B3D00AF4C07 /* SMMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMMainViewController.h; sourceTree = "<group>"; };
+		42F0803C1CA26B3D00AF4C07 /* SMMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMMainViewController.m; sourceTree = "<group>"; };
+		42F0803E1CA26B4600AF4C07 /* SMSportsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMSportsViewController.h; sourceTree = "<group>"; };
+		42F0803F1CA26B4600AF4C07 /* SMSportsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMSportsViewController.m; sourceTree = "<group>"; };
 		86619961407EC10F3B3CB8DE /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		BF5553653B04258F9B6EA4E6 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA9A0AD74FCA595CF3527CC5 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -272,6 +272,8 @@
 		421FEB3E1C931DEE009F76AA /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				42F0803B1CA26B3D00AF4C07 /* SMMainViewController.h */,
+				42F0803C1CA26B3D00AF4C07 /* SMMainViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -279,8 +281,6 @@
 		421FEB3F1C931DEE009F76AA /* View */ = {
 			isa = PBXGroup;
 			children = (
-				421FEB401C931DEE009F76AA /* SMMainViewController.h */,
-				421FEB411C931DEE009F76AA /* SMMainViewController.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -288,6 +288,8 @@
 		421FEB431C931DF5009F76AA /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				42F080381CA26B3100AF4C07 /* SMLoginViewController.h */,
+				42F080391CA26B3100AF4C07 /* SMLoginViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -295,8 +297,6 @@
 		421FEB441C931DF5009F76AA /* View */ = {
 			isa = PBXGroup;
 			children = (
-				421FEB451C931DF5009F76AA /* SMLoginViewController.h */,
-				421FEB461C931DF5009F76AA /* SMLoginViewController.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -314,6 +314,8 @@
 		421FEB551C940C9C009F76AA /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				42F080321CA26B1F00AF4C07 /* SMMyRecordViewController.h */,
+				42F080331CA26B1F00AF4C07 /* SMMyRecordViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -328,8 +330,6 @@
 		421FEB571C940C9C009F76AA /* View */ = {
 			isa = PBXGroup;
 			children = (
-				421FEB651C946B99009F76AA /* SMMyRecordViewController.h */,
-				421FEB661C946B99009F76AA /* SMMyRecordViewController.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -347,6 +347,8 @@
 		421FEB591C940C9C009F76AA /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				42F080351CA26B2700AF4C07 /* SMScoreBoardViewController.h */,
+				42F080361CA26B2700AF4C07 /* SMScoreBoardViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -365,8 +367,6 @@
 			children = (
 				421FEB5E1C940C9C009F76AA /* HJFSMTableViewCell.h */,
 				421FEB5F1C940C9C009F76AA /* HJFSMTableViewCell.m */,
-				421FEB601C940C9C009F76AA /* SMScoreBoardViewController.h */,
-				421FEB611C940C9C009F76AA /* SMScoreBoardViewController.m */,
 				421FEB6D1C96FCA3009F76AA /* HJFSMRTTableViewCell.h */,
 				421FEB6E1C96FCA3009F76AA /* HJFSMRTTableViewCell.m */,
 			);
@@ -376,6 +376,8 @@
 		421FEB681C9567A8009F76AA /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				42F0803E1CA26B4600AF4C07 /* SMSportsViewController.h */,
+				42F0803F1CA26B4600AF4C07 /* SMSportsViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -383,8 +385,6 @@
 		421FEB691C9567A8009F76AA /* View */ = {
 			isa = PBXGroup;
 			children = (
-				421FEB6A1C9567BD009F76AA /* SMSportsViewController.h */,
-				421FEB6B1C9567BD009F76AA /* SMSportsViewController.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -581,14 +581,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				421FEB6F1C96FCA3009F76AA /* HJFSMRTTableViewCell.m in Sources */,
-				421FEB421C931DEE009F76AA /* SMMainViewController.m in Sources */,
-				421FEB671C946B99009F76AA /* SMMyRecordViewController.m in Sources */,
+				42F080341CA26B1F00AF4C07 /* SMMyRecordViewController.m in Sources */,
+				42F0803A1CA26B3100AF4C07 /* SMLoginViewController.m in Sources */,
 				421FEB261C92B07F009F76AA /* main.m in Sources */,
-				421FEB641C940C9C009F76AA /* SMScoreBoardViewController.m in Sources */,
+				42F080371CA26B2700AF4C07 /* SMScoreBoardViewController.m in Sources */,
+				42F080401CA26B4600AF4C07 /* SMSportsViewController.m in Sources */,
 				421FEB631C940C9C009F76AA /* HJFSMTableViewCell.m in Sources */,
-				421FEB6C1C9567BD009F76AA /* SMSportsViewController.m in Sources */,
+				42F0803D1CA26B3D00AF4C07 /* SMMainViewController.m in Sources */,
 				42E4CB6B1CA0E28700BF5DB7 /* HJFActivityIndicatorView.m in Sources */,
-				421FEB471C931DF5009F76AA /* SMLoginViewController.m in Sources */,
 				421FEB251C92B07F009F76AA /* AppDelegate.m in Sources */,
 				421FEB621C940C9C009F76AA /* HJFSMScore.m in Sources */,
 			);

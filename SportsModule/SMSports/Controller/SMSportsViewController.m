@@ -323,7 +323,6 @@
     
     // 百度地图模块
     [self BMKMapInit];
-    NSLog(@"locationSerview:%@", self.bmkLocationService);
     [_bmkLocationService startUserLocationService];
     BMKCoordinateRegion adjustRegion = [self.mapView regionThatFits:BMKCoordinateRegionMake(self.bmkLocationService.userLocation.location.coordinate, BMKCoordinateSpanMake(0.02f,0.02f))];
     [self.mapView setRegion:adjustRegion animated:YES];
