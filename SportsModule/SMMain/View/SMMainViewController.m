@@ -253,4 +253,9 @@
     [self UILayout];
     self.extendedLayoutIncludesOpaqueBars = YES;
 }
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [UINavigationBar appearance].translucent = NO;
+}
 @end

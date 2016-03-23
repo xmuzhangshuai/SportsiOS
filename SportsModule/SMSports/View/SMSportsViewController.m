@@ -323,6 +323,7 @@
     
     // 百度地图模块
     [self BMKMapInit];
+    NSLog(@"locationSerview:%@", self.bmkLocationService);
     [_bmkLocationService startUserLocationService];
     BMKCoordinateRegion adjustRegion = [self.mapView regionThatFits:BMKCoordinateRegionMake(self.bmkLocationService.userLocation.location.coordinate, BMKCoordinateSpanMake(0.02f,0.02f))];
     [self.mapView setRegion:adjustRegion animated:YES];
@@ -604,10 +605,23 @@
     [self UILayout];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    self.mapView.delegate = self;
+    self.bmkLocationService.delegate = self;
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [detailsView removeFromSuperview];
-    [UINavigationBar appearance].translucent = NO;
+    self.navigationController.navigationBar.translucent = NO;
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"黑色背景"] forBarMetrics:UIBarMetricsDefault];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    self.mapView.delegate = nil;
+    self.bmkLocationService.delegate = nil;
 }
 
 @end

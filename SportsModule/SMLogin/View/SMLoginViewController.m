@@ -92,32 +92,34 @@
  *  前往主界面
  */
 - (void)toMainView {
-    HJFActivityIndicatorView *waitView = [[HJFActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 0.3*SCREEN_WIDTH, 0.8*0.3*SCREEN_WIDTH) andViewAlpha:0.8 andCornerRadius:8];
-    waitView.center = self.view.center;
-    [self.view addSubview:waitView];
-    if (![userIdTF.text isEqualToString:@""]) {
-        NSDictionary *dict = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%@", userIdTF.text] forKey:@"regCode"];
-        [AVCloud callFunctionInBackground:@"UserLogin" withParameters:dict block:^(id object, NSError *error) {
-            [waitView removeFromSuperview];
-            NSNumber *resultCode = object[@"resultCode"];
-            if ([resultCode intValue] == 200) {
-                NSLog(@"%@", object);
-                // 将用户id记录到缓存
-                NSString *currentIntegral = object[@"integral"];
-                NSString *userId = object[@"userId"];
-                SMMainViewController *mainViewController = [[SMMainViewController alloc] init];
-                [self.navigationController pushViewController:mainViewController animated:YES];
-            }else {
-                NSString *errorMessage = object[@"errorMessage"];
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:errorMessage delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
-                [alertView show];
-            }
-        }];
-    }else {
-        [waitView removeFromSuperview];
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"请输入用户识别码" delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
-        [alertView show];
-    }
+//    HJFActivityIndicatorView *waitView = [[HJFActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 0.3*SCREEN_WIDTH, 0.8*0.3*SCREEN_WIDTH) andViewAlpha:0.8 andCornerRadius:8];
+//    waitView.center = self.view.center;
+//    [self.view addSubview:waitView];
+//    if (![userIdTF.text isEqualToString:@""]) {
+//        NSDictionary *dict = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%@", userIdTF.text] forKey:@"regCode"];
+//        [AVCloud callFunctionInBackground:@"UserLogin" withParameters:dict block:^(id object, NSError *error) {
+//            [waitView removeFromSuperview];
+//            NSNumber *resultCode = object[@"resultCode"];
+//            if ([resultCode intValue] == 200) {
+//                NSLog(@"%@", object);
+//                // 将用户id记录到缓存
+//                NSString *currentIntegral = object[@"integral"];
+//                NSString *userId = object[@"userId"];
+//                SMMainViewController *mainViewController = [[SMMainViewController alloc] init];
+//                [self.navigationController pushViewController:mainViewController animated:YES];
+//            }else {
+//                NSString *errorMessage = object[@"errorMessage"];
+//                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:errorMessage delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+//                [alertView show];
+//            }
+//        }];
+//    }else {
+//        [waitView removeFromSuperview];
+//        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"请输入用户识别码" delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+//        [alertView show];
+//    }
+    SMMainViewController *mainViewController = [[SMMainViewController alloc] init];
+    [self.navigationController pushViewController:mainViewController animated:YES];
 }
 
 
