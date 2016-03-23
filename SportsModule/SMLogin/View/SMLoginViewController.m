@@ -7,7 +7,6 @@
 //
 
 #import "SMLoginViewController.h"
-#import "AFNetworking.h"
 #import "UISize.h"
 #import "SMSize.h"
 #import "SMMainViewController.h"
