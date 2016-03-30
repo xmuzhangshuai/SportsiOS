@@ -12,7 +12,6 @@
 
 @property (nonatomic, copy) NSString *userName;
 @property (nonatomic, copy) NSString *userScore;
-@property (nonatomic, copy) NSString *userRank;
 @property (nonatomic, strong) NSString *userPicUrl;
 
 - (HJFSMScore *)initWithDict:(NSDictionary *)dict;

@@ -11,7 +11,11 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+/** 本地数据库路径 */
+@property (nonatomic, strong) NSString *dataBasePath;
 
+/** 记录当前的运动uId 类型UUID */
+@property (nonatomic) NSString  *currentUUID;
 
 @end
 

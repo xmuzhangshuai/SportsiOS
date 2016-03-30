@@ -11,9 +11,12 @@
 #import "HJFSMRTTableViewCell.h"
 #import "UISize.h"
 #import "SMSize.h"
+#import "HJFActivityIndicatorView.h"
 
-#pragma mark - LeanCloud
+/** leancloud */
 #import "AVOSCloud/AVOSCloud.h"
+
+
 
 #define TIMELABEL_X         0
 #define TIMELABEL_Y         STATUS_HEIGHT+NAVIGATIONBAR_HEIGHT
@@ -55,7 +58,11 @@
     UIView      *rightButtonView;       // 日排行按钮
     NSString    *rankTimeStr;           // 记录当前是什么排行 如果选择当前排行则不需要请求缓存
     UIButton    *buttonL;               // 显示日排行按钮，设置成成员变量
-    NSMutableArray *array;  //测试
+    NSMutableArray *rankArray;          // 存储排名信息
+    HJFActivityIndicatorView *activityIndicatorView;    // 等待动画
+    BOOL        isShow;                 // 判断是否viewDidLoad过，不重复加载界面
+    NSUInteger  myRank;                 // 记录当前用户排名
+    NSUserDefaults  *userDefaults;
 }
 
 - (id)init {
@@ -67,8 +74,10 @@
         rankTimeTableView   = [[UITableView alloc] init];
         rankTimeArray       = @[@"日排行", @"周排行", @"月排行", @"年排行"];
         cover               = [[UIView alloc] init];
-        array = [[NSMutableArray alloc] init];
+        rankArray           = [[NSMutableArray alloc] init];
         rankTimeStr         = @"日排行";
+        isShow              = NO;
+        userDefaults        = [NSUserDefaults standardUserDefaults];
     }
     return self;
 }
@@ -151,7 +160,7 @@
     [cover addSubview:rankTimeImageView];
     [self.view addSubview:cover];
     
-    [self NavigationInit];
+
 }
 
 #pragma mark - TableView代理
@@ -161,7 +170,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (tableView.tag == 0) {
-        return 7;
+        return rankArray.count;
     }else {
         return 4;
     }
@@ -175,8 +184,8 @@
         if(!cell){
             cell=[[HJFSMTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         }
-        cell.score = [array objectAtIndex:indexPath.row];
-        cell.rankLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:16];
+        cell.score = [rankArray objectAtIndex:indexPath.row];
+        cell.rankLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:20];
         cell.rankLabel.text = [NSString stringWithFormat:@"%ld", (long)indexPath.row+1];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         if (indexPath.row == 0) {
@@ -240,6 +249,7 @@
                         cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
                     }
                 }
+                [self loadRankData:1];
             }
         }else if (indexPath.row == 1) {
             if (![rankTimeStr isEqualToString:@"周排行"]) {
@@ -257,6 +267,7 @@
                         cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
                     }
                 }
+                [self loadRankData:2];
             }
         }else if (indexPath.row == 2) {
             if (![rankTimeStr isEqualToString:@"月排行"]) {
@@ -274,6 +285,7 @@
                         cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
                     }
                 }
+                [self loadRankData:3];
             }
         }else if (indexPath.row == 3) {
             if (![rankTimeStr isEqualToString:@"年排行"]) {
@@ -292,6 +304,7 @@
                     }
                 }
             }
+            [self loadRankData:4];
         }
         [self hiddenRankTimeMenu];
     }
@@ -354,23 +367,71 @@
     [UIView commitAnimations];
 }
 
+- (void)loadRankData:(int)filter {
+    activityIndicatorView = [[HJFActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 0.3*SCREEN_WIDTH, 0.8*0.3*SCREEN_WIDTH) andViewAlpha:0.8 andCornerRadius:8];
+    activityIndicatorView.center = self.view.center;
+    [self.view addSubview:activityIndicatorView];
+    NSNumber *typeNumber = [[NSNumber alloc] initWithInt:1];
+    NSNumber *unitNumber = [[NSNumber alloc] initWithInt:filter];
+    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:typeNumber, @"type", unitNumber, @"unit" , nil];
+    [AVCloud callFunctionInBackground:@"GetUserTopList" withParameters:dict block:^(id object, NSError *error) {
+        NSLog(@"list:%@", object);
+        NSNumber *resultCode = object[@"resultCode"];
+        if ([resultCode intValue] == 200) {
+            // 获取成功
+            NSArray *infoArray = object[@"info"];
+            if (rankArray.count != 0) {
+                [rankArray removeAllObjects];
+            }
+            [infoArray enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                NSString *userId = obj[@"userId"];
+                if ([userId isEqualToString:[userDefaults objectForKey:@"userId"]]) {
+                    myRank = idx;
+                }
+                NSNumber *integral = obj[@"integral"];
+                NSString *userScore = [NSString stringWithFormat:@"%d", [integral intValue]];
+                NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      obj[@"userName"],@"userName",
+                                      userScore, @"userScore",
+                                      obj[@"portrait"], @"userPicUrl", nil];
+                HJFSMScore *score = [HJFSMScore scoreWithDict:dict];
+                NSLog(@"图片地址：%@", score.userPicUrl);
+                [rankArray addObject:score];
+            }];
+            [activityIndicatorView removeFromSuperview];
+            if (!isShow) {
+                [self UILayout];
+                isShow = YES;
+            }
+            [scoreBoardTableView reloadData];
+            NSDateFormatter *df = [[NSDateFormatter alloc] init];
+            [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+            NSString *time = [df stringFromDate:[NSDate date]];
+            timeLabel.text = [NSString stringWithFormat:@"最近统计时间：%@", time];
+            if (myRank > 100) {
+                rankLabel.text = [NSString stringWithFormat:@"我的排名：榜外"];
+            }else {
+                rankLabel.text = [NSString stringWithFormat:@"我的排名：%lu", (unsigned long)myRank+1];
+            }
+        }else {
+            [activityIndicatorView removeFromSuperview];
+            if (!isShow) {
+                [self UILayout];
+                isShow = YES;
+            }
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:object[@"errorMessage"] delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+            [alertView show];
+        }
+    }];
+}
+
+#pragma mark - Life Cycle
+
 - (void)viewDidLoad {
     self.view.backgroundColor = [UIColor colorWithRed:88/255.0 green:89/255.0 blue:91/255.0 alpha:1.0];
     self.extendedLayoutIncludesOpaqueBars = YES;
-    [self UILayout];
-    for (int i = 0; i < 7; i++) {
-        NSDictionary *dic = @{@"userName":@"张三",@"userScore":@"1234"};
-        HJFSMScore *score = [[HJFSMScore alloc] initWithDict:dic];
-        [array addObject:score];
-    }
-    
-    NSNumber *typeNumber = [[NSNumber alloc] initWithInt:1];
-    NSNumber *unitNumber = [[NSNumber alloc] initWithInt:1];
-    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:typeNumber, @"type", unitNumber, @"unit" , nil];
-    NSLog(@"%@", dict);
-    [AVCloud callFunctionInBackground:@"GetUserTopList" withParameters:dict block:^(id object, NSError *error) {
-        NSLog(@"积分榜信息：%@  错误信息：%@", object, error);
-    }];
+    [self NavigationInit];
+    [self loadRankData:1];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

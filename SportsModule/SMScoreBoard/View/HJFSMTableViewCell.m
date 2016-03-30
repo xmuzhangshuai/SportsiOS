@@ -9,11 +9,13 @@
 #import "HJFSMTableViewCell.h"
 #import "UISize.h"
 #import "SMSize.h"
+/** sdwebimage */
+#import "UIImageView+WebCache.h"
 
 #define CELL_HEIGHT     0.14*SCREEN_HEIGHT
 #define RANKLABEL_X     0.08*SCREEN_WIDTH
 #define RANKLABEL_Y     0.063*SCREEN_HEIGHT
-#define RANKLABEL_WIDTH 0.023*SCREEN_HEIGHT
+#define RANKLABEL_WIDTH 0.03*SCREEN_HEIGHT
 
 #define USERIMAGEVIEW_X 2*RANKLABEL_X
 #define USERIMAGEVIEW_Y 0.045*SCREEN_HEIGHT
@@ -26,12 +28,12 @@
 
 #define USERNAMELABEL_CENTER_Y  0.49*CELL_HEIGHT
 #define USERNAMELABEL_WIDTH     0.15*SCREEN_WIDTH
-#define USERNAMELABEL_HEIGHT    0.133*CELL_HEIGHT
+#define USERNAMELABEL_HEIGHT    0.9*CELL_HEIGHT
 
 #define USERSCORELABEL_WIDTH    0.2*SCREEN_WIDTH
 #define USERSCORELABEL_HEIGHT   USERNAMELABEL_HEIGHT*1.2
 #define USERSCORELABEL_X        0.72*SCREEN_WIDTH
-#define USERSCORELABEL_Y        0.49*CELL_HEIGHT
+#define USERSCORELABEL_Y        0.9*CELL_HEIGHT
 
 @interface HJFSMTableViewCell()
 
@@ -59,7 +61,7 @@
     [self.contentView addSubview:_rankLabel];
     
     _rankImageView = [[UIImageView alloc] init];
-    // 设置图片是否需要？？？？？？？
+    _rankImageView.contentMode = UIViewContentModeScaleAspectFit;
     [self.contentView addSubview:_rankImageView];
     
     _userImageView = [[UIImageView alloc] init];
@@ -68,9 +70,11 @@
     [self.contentView addSubview:_userImageView];
     
     userNameLabel = [[UILabel alloc] init];
+    userNameLabel.textAlignment = NSTextAlignmentCenter;
     [self.contentView addSubview:userNameLabel];
     
     userScoreLabel = [[UILabel alloc] init];
+    userScoreLabel.textAlignment = NSTextAlignmentRight;
     [self.contentView addSubview:userScoreLabel];
 }
 
@@ -82,7 +86,8 @@
     _rankImageView.contentMode = UIViewContentModeLeft;
     
     _userImageView.frame = CGRectMake(USERIMAGEVIEW_X, USERIMAGEVIEW_Y, USERIMAGEVIEW_WIDTH, USERIMAGEVIEW_WIDTH);
-    _userImageView.backgroundColor = [UIColor grayColor];
+    [_userImageView sd_setImageWithURL:[NSURL URLWithString:score.userPicUrl]];
+//    _userImageView.backgroundColor = [UIColor grayColor];
     
     userNameLabel.frame = CGRectMake(0, 0, USERNAMELABEL_WIDTH, USERNAMELABEL_HEIGHT);
     userNameLabel.center = CGPointMake(CENTER_X, USERNAMELABEL_CENTER_Y);

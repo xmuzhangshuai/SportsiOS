@@ -31,6 +31,17 @@
 		42F0803A1CA26B3100AF4C07 /* SMLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F080391CA26B3100AF4C07 /* SMLoginViewController.m */; };
 		42F0803D1CA26B3D00AF4C07 /* SMMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F0803C1CA26B3D00AF4C07 /* SMMainViewController.m */; };
 		42F080401CA26B4600AF4C07 /* SMSportsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F0803F1CA26B4600AF4C07 /* SMSportsViewController.m */; };
+		42F080431CA6703B00AF4C07 /* SaveDataToServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F080421CA6703B00AF4C07 /* SaveDataToServer.m */; };
+		42F080461CA670F100AF4C07 /* SaveDataToLocalDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F080451CA670F100AF4C07 /* SaveDataToLocalDB.m */; };
+		42F0804B1CAA27D500AF4C07 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F0804A1CAA27D500AF4C07 /* CoreTelephony.framework */; };
+		42F080581CAA299700AF4C07 /* iflyMSC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F080571CAA299700AF4C07 /* iflyMSC.framework */; };
+		42F0805A1CAA2BCD00AF4C07 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F080591CAA2BCD00AF4C07 /* libc++.tbd */; };
+		42F0805C1CAA2BD300AF4C07 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F0805B1CAA2BD300AF4C07 /* libz.tbd */; };
+		42F0805E1CAA2CEE00AF4C07 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F0805D1CAA2CEE00AF4C07 /* AddressBook.framework */; };
+		42F080601CAA2CFF00AF4C07 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F0805F1CAA2CFF00AF4C07 /* AudioToolbox.framework */; };
+		42F080621CAA2D0F00AF4C07 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F080611CAA2D0F00AF4C07 /* AVFoundation.framework */; };
+		42F0806D1CABD1B400AF4C07 /* IntegralGainedHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F0806C1CABD1B400AF4C07 /* IntegralGainedHistory.m */; };
+		42F080701CABD1C100AF4C07 /* SportRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 42F0806F1CABD1C100AF4C07 /* SportRecord.m */; };
 		5861A4F90B436FA6429260C8 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF5553653B04258F9B6EA4E6 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -93,6 +104,21 @@
 		42F0803C1CA26B3D00AF4C07 /* SMMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMMainViewController.m; sourceTree = "<group>"; };
 		42F0803E1CA26B4600AF4C07 /* SMSportsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMSportsViewController.h; sourceTree = "<group>"; };
 		42F0803F1CA26B4600AF4C07 /* SMSportsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMSportsViewController.m; sourceTree = "<group>"; };
+		42F080411CA6703B00AF4C07 /* SaveDataToServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SaveDataToServer.h; sourceTree = "<group>"; };
+		42F080421CA6703B00AF4C07 /* SaveDataToServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SaveDataToServer.m; sourceTree = "<group>"; };
+		42F080441CA670F100AF4C07 /* SaveDataToLocalDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SaveDataToLocalDB.h; sourceTree = "<group>"; };
+		42F080451CA670F100AF4C07 /* SaveDataToLocalDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SaveDataToLocalDB.m; sourceTree = "<group>"; };
+		42F0804A1CAA27D500AF4C07 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		42F080571CAA299700AF4C07 /* iflyMSC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = iflyMSC.framework; sourceTree = "<group>"; };
+		42F080591CAA2BCD00AF4C07 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		42F0805B1CAA2BD300AF4C07 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		42F0805D1CAA2CEE00AF4C07 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		42F0805F1CAA2CFF00AF4C07 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		42F080611CAA2D0F00AF4C07 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		42F0806B1CABD1B400AF4C07 /* IntegralGainedHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IntegralGainedHistory.h; sourceTree = "<group>"; };
+		42F0806C1CABD1B400AF4C07 /* IntegralGainedHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IntegralGainedHistory.m; sourceTree = "<group>"; };
+		42F0806E1CABD1C100AF4C07 /* SportRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SportRecord.h; sourceTree = "<group>"; };
+		42F0806F1CABD1C100AF4C07 /* SportRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SportRecord.m; sourceTree = "<group>"; };
 		86619961407EC10F3B3CB8DE /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		BF5553653B04258F9B6EA4E6 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA9A0AD74FCA595CF3527CC5 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -103,6 +129,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42F080621CAA2D0F00AF4C07 /* AVFoundation.framework in Frameworks */,
+				42F080601CAA2CFF00AF4C07 /* AudioToolbox.framework in Frameworks */,
+				42F0805E1CAA2CEE00AF4C07 /* AddressBook.framework in Frameworks */,
+				42F0805C1CAA2BD300AF4C07 /* libz.tbd in Frameworks */,
+				42F0805A1CAA2BCD00AF4C07 /* libc++.tbd in Frameworks */,
+				42F0804B1CAA27D500AF4C07 /* CoreTelephony.framework in Frameworks */,
 				42E4CB651CA04A1B00BF5DB7 /* libstdc++.6.0.9.tbd in Frameworks */,
 				42E4CB631CA04A0E00BF5DB7 /* libsqlite3.0.tbd in Frameworks */,
 				42E4CB421C9FF09100BF5DB7 /* Security.framework in Frameworks */,
@@ -112,6 +144,7 @@
 				42E4CB3A1C9FF05B00BF5DB7 /* QuartzCore.framework in Frameworks */,
 				42E4CB381C9FF04E00BF5DB7 /* CoreLocation.framework in Frameworks */,
 				5861A4F90B436FA6429260C8 /* libPods.a in Frameworks */,
+				42F080581CAA299700AF4C07 /* iflyMSC.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,6 +278,13 @@
 		421FEB2C1C92B1D0009F76AA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				42F080611CAA2D0F00AF4C07 /* AVFoundation.framework */,
+				42F0805F1CAA2CFF00AF4C07 /* AudioToolbox.framework */,
+				42F0805D1CAA2CEE00AF4C07 /* AddressBook.framework */,
+				42F0805B1CAA2BD300AF4C07 /* libz.tbd */,
+				42F080591CAA2BCD00AF4C07 /* libc++.tbd */,
+				42F080561CAA299700AF4C07 /* ifly */,
+				42F0804A1CAA27D500AF4C07 /* CoreTelephony.framework */,
 				42E4CB641CA04A1B00BF5DB7 /* libstdc++.6.0.9.tbd */,
 				42E4CB621CA04A0E00BF5DB7 /* libsqlite3.0.tbd */,
 				42E4CB411C9FF09100BF5DB7 /* Security.framework */,
@@ -323,6 +363,10 @@
 		421FEB561C940C9C009F76AA /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				42F0806B1CABD1B400AF4C07 /* IntegralGainedHistory.h */,
+				42F0806C1CABD1B400AF4C07 /* IntegralGainedHistory.m */,
+				42F0806E1CABD1C100AF4C07 /* SportRecord.h */,
+				42F0806F1CABD1C100AF4C07 /* SportRecord.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -378,6 +422,10 @@
 			children = (
 				42F0803E1CA26B4600AF4C07 /* SMSportsViewController.h */,
 				42F0803F1CA26B4600AF4C07 /* SMSportsViewController.m */,
+				42F080411CA6703B00AF4C07 /* SaveDataToServer.h */,
+				42F080421CA6703B00AF4C07 /* SaveDataToServer.m */,
+				42F080441CA670F100AF4C07 /* SaveDataToLocalDB.h */,
+				42F080451CA670F100AF4C07 /* SaveDataToLocalDB.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -387,6 +435,14 @@
 			children = (
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		42F080561CAA299700AF4C07 /* ifly */ = {
+			isa = PBXGroup;
+			children = (
+				42F080571CAA299700AF4C07 /* iflyMSC.framework */,
+			);
+			path = ifly;
 			sourceTree = "<group>";
 		};
 		7D4017D1D5DDBA650745EA33 /* Pods */ = {
@@ -584,6 +640,9 @@
 				42F080341CA26B1F00AF4C07 /* SMMyRecordViewController.m in Sources */,
 				42F0803A1CA26B3100AF4C07 /* SMLoginViewController.m in Sources */,
 				421FEB261C92B07F009F76AA /* main.m in Sources */,
+				42F0806D1CABD1B400AF4C07 /* IntegralGainedHistory.m in Sources */,
+				42F080431CA6703B00AF4C07 /* SaveDataToServer.m in Sources */,
+				42F080461CA670F100AF4C07 /* SaveDataToLocalDB.m in Sources */,
 				42F080371CA26B2700AF4C07 /* SMScoreBoardViewController.m in Sources */,
 				42F080401CA26B4600AF4C07 /* SMSportsViewController.m in Sources */,
 				421FEB631C940C9C009F76AA /* HJFSMTableViewCell.m in Sources */,
@@ -591,6 +650,7 @@
 				42E4CB6B1CA0E28700BF5DB7 /* HJFActivityIndicatorView.m in Sources */,
 				421FEB251C92B07F009F76AA /* AppDelegate.m in Sources */,
 				421FEB621C940C9C009F76AA /* HJFSMScore.m in Sources */,
+				42F080701CABD1C100AF4C07 /* SportRecord.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -717,6 +777,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/BaiduMap_IOSSDK_v2.10.0",
+					"$(PROJECT_DIR)/ifly",
 				);
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = SportsModule/Resource/Info.plist;
@@ -736,6 +797,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/BaiduMap_IOSSDK_v2.10.0",
+					"$(PROJECT_DIR)/ifly",
 				);
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = SportsModule/Resource/Info.plist;

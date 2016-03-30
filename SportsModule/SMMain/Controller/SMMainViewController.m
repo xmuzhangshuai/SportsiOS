@@ -12,6 +12,11 @@
 #import "SMScoreBoardViewController.h"
 #import "SMMyRecordViewController.h"
 #import "SMSportsViewController.h"
+#import "AppDelegate.h"
+
+#import <AVOSCloud/AVOSCloud.h>
+#import <FMDB/FMDB.h>
+#import "HJFActivityIndicatorView.h"
 
 #define SPORTTIME_CENTER_Y      0.23*SCREEN_HEIGHT
 #define SPORTDISTANCE_CENTER_Y  0.4*SCREEN_HEIGHT
@@ -51,6 +56,16 @@
     UIButton    *walkButton;
     UIButton    *bikeButton;
     UIImageView *arrowImageView;     // 箭头图片
+
+    HJFActivityIndicatorView *activityIndicatorView;
+    
+    AppDelegate *myAppDelegate;
+    
+    NSUserDefaults  *userDefaults;
+    
+    BOOL        isShow;             // 判断是否已经加载过视图
+    NSTimeInterval totalTime;       // 总运动时间
+    CGFloat     totalDistance;      // 总运动里程
 }
 
 - (id)init {
@@ -67,6 +82,18 @@
         walkButton      = [[UIButton alloc] init];
         bikeButton      = [[UIButton alloc] init];
         arrowImageView  = [[UIImageView alloc] init];
+        isShow          = NO;
+        totalTime       = 0;
+        totalDistance   = 0;
+        
+        // 判断是否正在运动
+        myAppDelegate   = [[UIApplication sharedApplication] delegate];
+        
+        userDefaults    = [NSUserDefaults standardUserDefaults];
+        if ([userDefaults boolForKey:@"isSport"] == YES) {
+            [userDefaults setBool:[self IsSport] forKey:@"isSport"];
+        }
+        NSLog(@"是否运动中：%d", [userDefaults boolForKey:@"isSport"]);
     }
     return self;
 }
@@ -118,8 +145,13 @@
     
     KButton.frame = CGRectMake(0, 0, KBUTTON_WIDTH, KBUTTON_WIDTH);
     KButton.center = CGPointMake(CENTER_X, KBUTTON_CENTER_Y);
-    [KButton setImage:[UIImage imageNamed:@"K图标"] forState:UIControlStateNormal];
-    [KButton addTarget:self action:@selector(toSportChoice) forControlEvents:UIControlEventTouchUpInside];
+    if (![userDefaults boolForKey:@"isSport"]) {
+        [KButton setImage:[UIImage imageNamed:@"K图标"] forState:UIControlStateNormal];
+        [KButton addTarget:self action:@selector(toSportChoice) forControlEvents:UIControlEventTouchUpInside];
+    }else {
+        [KButton setImage:[UIImage imageNamed:@"运动中图标"] forState:UIControlStateNormal];
+        [KButton addTarget:self action:@selector(toMapView) forControlEvents:UIControlEventTouchUpInside];
+    }
     
     logoutButton.frame = CGRectMake(0, SCREEN_HEIGHT-LOGOUTBUTTON_HEIGHT, SCREEN_WIDTH, LOGOUTBUTTON_HEIGHT);
     logoutButton.backgroundColor = [UIColor colorWithRed:230/255.0 green:0 blue:18/255.0 alpha:1.0];
@@ -169,8 +201,6 @@
     [cover addSubview:bikeButton];
     [cover addSubview:arrowImageView];
     [self.view addSubview:cover];
-    
-    [self NavigationInit];
 }
 
 #pragma mark - 私有方法
@@ -218,6 +248,11 @@
     [self hiddenMenu];
 }
 
+- (void)toMapView {
+    SMSportsViewController *sportViewController = [[SMSportsViewController alloc] init];
+    [self.navigationController pushViewController:sportViewController animated:YES];
+}
+
 - (void)chooseRun {
     SMSportsViewController *sportsViewController = [[SMSportsViewController alloc] initWithSport:@"跑"];
     [self.navigationController pushViewController:sportsViewController animated:YES];
@@ -247,15 +282,154 @@
     [self.navigationController pushViewController:scoreBoardViewController animated:YES];
 }
 
+/**
+ *  判断是否在运动
+ */
+- (BOOL)IsSport {
+    FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
+    [db open];
+    FMResultSet *resultSet = [db executeQuery:@"select * from sportrecordtemp"];
+    while ([resultSet next]) {
+        NSArray *startTimeStr = [[resultSet stringForColumn:@"starttime"] componentsSeparatedByString:@" "];
+        NSLog(@"start%@", startTimeStr[0]);
+        if ([self isToday:startTimeStr[0]]) {
+            [db close];
+            return  YES;
+        }
+    }
+    [db close];
+    return NO;
+}
+
+/**
+ *  判断当前日期是否是今天
+ */
+- (BOOL)isToday:(NSString *)date {
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd"];
+    NSString *today = [formatter stringFromDate:[NSDate date]];
+    NSLog(@"today:%@ startday:%@", today, date);
+    if ([today isEqualToString:date]) {
+        return YES;
+    }else {
+        return NO;
+    }
+}
+
+/**
+ *  同步服务器数据库
+ **/
+- (void)downloadServerDataBase {
+    AVQuery *integralQuery = [AVQuery queryWithClassName:@"IntegralGained"];
+    [integralQuery whereKey:@"useId" hasPrefix:[userDefaults objectForKey:@"userId"]];
+    [integralQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        // 同步积分表
+        /** 先删除原先的数据 */
+        FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
+        if ([db open]) {
+            [db executeUpdate:@"delete from integralgained"];
+            for (AVObject *temp in objects) {
+                NSString *uid = temp[@"uid"];
+                NSString *userid = temp[@"useId"];
+                NSDate *gaintime = temp[@"gainTime"];
+                int integral = [temp[@"integral"] intValue];
+                int gainreason = [temp[@"gainReason"] intValue];
+                [db executeUpdate:[NSString stringWithFormat:@"insert into integralgained (uid, useid, gaintime, integral, gainreason) values ('%@', '%@', '%@', %d, %d)", uid, userid, gaintime, integral, gainreason]];
+            }
+            [activityIndicatorView removeFromSuperview];
+            if (!isShow) {
+                [self UILayout];
+                isShow = YES;
+            }
+        }
+        [db close];
+    }];
+    
+    
+    AVQuery *sportQuery = [AVQuery queryWithClassName:@"SportRecord"];
+    [sportQuery whereKey:@"userID" containsString:[userDefaults objectForKey:@"userId"]];
+    [sportQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        // 同步运动记录表
+        /** 先删除原先的数据 */
+        FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
+        if ([db open]) {
+            [db executeUpdate:@"delete from sportrecord"];
+            for (AVObject *temp in objects) {
+                NSString *uid = temp[@"uid"];
+                NSString *userid = temp[@"userID"];
+                int sporttype = [temp[@"sportType"] intValue];
+                NSDate *starttime = temp[@"startTime"];
+                NSDate *endtime = temp[@"endTime"];
+                int pausetime = [temp[@"pauseTime"] intValue];
+                NSString *motiontrack = temp[@"motionTrack"];
+                CGFloat distance = [temp[@"distance"] floatValue];
+                [db executeUpdate:[NSString stringWithFormat:@"insert into sportrecord (uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance) values ('%@', '%@', %d, '%@', '%@', %d, '%@', %f)", uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance]];
+                totalTime += [self intervalFrom:starttime to:endtime];
+                totalDistance += distance;
+            }
+            [activityIndicatorView removeFromSuperview];
+            if (!isShow) {
+                [self UILayout];
+                isShow = YES;
+            }
+            detailsTime.text = [self intervalToTime:totalTime];
+            detailsDistance.text = [NSString stringWithFormat:@"%.1f公里", totalDistance/1000];
+        }
+        [db close];
+    }];
+}
+
+/**
+ *  两个时间差
+ **/
+- (NSTimeInterval)intervalFrom:(NSDate *)earlyDate to:(NSDate *)lateDate
+{
+    
+    NSTimeInterval early = [earlyDate timeIntervalSince1970]*1;
+    NSTimeInterval late = [lateDate timeIntervalSince1970]*1;
+    
+    NSTimeInterval cha=late-early;
+    
+    return cha;
+}
+
+/**
+ *  秒转小时
+ **/
+- (NSString *)intervalToTime:(NSTimeInterval)timeInterval {
+    int min = [[NSString stringWithFormat:@"%d", (int)timeInterval/60%60] intValue];
+    
+    int house = [[NSString stringWithFormat:@"%d", (int)timeInterval/3600] intValue];
+    
+    NSString *timeString=[NSString stringWithFormat:@"%d时%d分钟",house,min];
+    return timeString;
+}
+
 #pragma mark - Life Cycle
 - (void)viewDidLoad {
     self.view.backgroundColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0];
-    [self UILayout];
+    /** 同步数据库动画效果 */
+    activityIndicatorView = [[HJFActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 0.3*SCREEN_WIDTH, 0.8*0.3*SCREEN_WIDTH) andViewAlpha:0.8 andCornerRadius:8];
+    activityIndicatorView.center = self.view.center;
+    [self.view addSubview:activityIndicatorView];
+    [self NavigationInit];
+    [self downloadServerDataBase];
     self.extendedLayoutIncludesOpaqueBars = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [UINavigationBar appearance].translucent = NO;
+    if (![userDefaults boolForKey:@"isSport"]) {
+        [KButton setImage:[UIImage imageNamed:@"K图标"] forState:UIControlStateNormal];
+        [KButton addTarget:self action:@selector(toSportChoice) forControlEvents:UIControlEventTouchUpInside];
+    }else {
+        [KButton setImage:[UIImage imageNamed:@"运动中图标"] forState:UIControlStateNormal];
+        [KButton addTarget:self action:@selector(toMapView) forControlEvents:UIControlEventTouchUpInside];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [self hiddenMenu];
 }
 @end

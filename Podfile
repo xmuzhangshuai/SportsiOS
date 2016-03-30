@@ -11,3 +11,5 @@ pod ‘FMDB’
 # pod 'FMDB/SQLCipher'   # FMDB with SQLCipher
 
 pod ‘BaiduMapKit’ #百度地图SDK
+
+pod ‘SDWebImage’	

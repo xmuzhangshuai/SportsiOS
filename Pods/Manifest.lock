@@ -27,6 +27,9 @@ PODS:
   - FMDB (2.6):
     - FMDB/standard (= 2.6)
   - FMDB/standard (2.6)
+  - SDWebImage (3.7.5):
+    - SDWebImage/Core (= 3.7.5)
+  - SDWebImage/Core (3.7.5)
 
 DEPENDENCIES:
   - AFNetworking (= 2.6.3)
@@ -34,6 +37,7 @@ DEPENDENCIES:
   - AVOSCloudCrashReporting
   - BaiduMapKit
   - FMDB
+  - SDWebImage
 
 SPEC CHECKSUMS:
   AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
@@ -41,5 +45,6 @@ SPEC CHECKSUMS:
   AVOSCloudCrashReporting: 68b4c9096c5f465f1cbda4a1d7ea5f04efa930ab
   BaiduMapKit: 5df028c6b455d29e68e89694adbcf9d37a4bcc99
   FMDB: c1968bab3ab0aed38f66cb778ae1e7fa9a652b6e
+  SDWebImage: 69c6303e3348fba97e03f65d65d4fbc26740f461
 
 COCOAPODS: 0.39.0

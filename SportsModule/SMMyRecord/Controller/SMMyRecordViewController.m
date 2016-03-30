@@ -9,6 +9,13 @@
 #import "SMMyRecordViewController.h"
 #import "UISize.h"
 #import "SMSize.h"
+#import "AppDelegate.h"
+#import "SportRecord.h"
+#import "IntegralGainedHistory.h"
+#import "HJFActivityIndicatorView.h"
+
+/** 数据库 */
+#import "FMDB/FMDB.h"
 
 #define SCOREVIEW_X             0.225*SCREEN_WIDTH
 #define SCOREVIEW_Y             STATUS_HEIGHT+NAVIGATIONBAR_HEIGHT+10
@@ -62,8 +69,13 @@
     UIImageView *historyRedPoint;   // 选择历史红色图标
     UIImageView *recordRedPoint;    // 我的记录红色图标
     UITableView *myTableView;  // 列表
-    
     BOOL        tableViewSwitch;    // 列表选择判断变量 1：history   0：record
+    NSUserDefaults *userDefaults;
+    AppDelegate *myAppDelegate;
+    NSMutableArray  *integralArray; //获取记录
+    NSMutableArray  *sportArray;    //运动记录
+    BOOL        isShow;             // 记录是否加载过视图
+    HJFActivityIndicatorView    *activityIndicatorView;
 }
 
 - (id)init {
@@ -79,8 +91,13 @@
         recordButton    = [[UIButton alloc] init];
         historyRedPoint = [[UIImageView alloc] init];
         recordRedPoint  = [[UIImageView alloc] init];
-        myTableView    = [[UITableView alloc] init];
+        myTableView     = [[UITableView alloc] init];
         tableViewSwitch = YES;
+        userDefaults    = [NSUserDefaults standardUserDefaults];
+        myAppDelegate   = [[UIApplication sharedApplication] delegate];
+        integralArray   = [[NSMutableArray alloc] init];
+        sportArray      = [[NSMutableArray alloc] init];
+        isShow          = NO;
     }
     return self;
 }
@@ -98,7 +115,8 @@
     [scoreView addSubview:scoreImageView];
     
     scoreLabel.frame = CGRectMake(SCORELABEL_X, SCORELABEL_Y, SCORELABEL_WIDTH, SCORELABEL_HEIGHT);
-    scoreLabel.text = @"当前积分6666分";
+    NSNumber *totalIntegral = [userDefaults objectForKey:@"currentIntegral"];
+    scoreLabel.text = [NSString stringWithFormat:@"当前积分%d分", [totalIntegral intValue]];
     scoreLabel.font = [UIFont systemFontOfSize:15];
     scoreLabel.textAlignment = NSTextAlignmentCenter;
     scoreLabel.textColor = [UIColor whiteColor];
@@ -146,9 +164,6 @@
     [self.view addSubview:switchView];
     [self.view addSubview:cutLineView];
     [self.view addSubview:myTableView];
-    
-    [self NavigationInit];
-    
 }
 
 #pragma mark - 导航栏设置
@@ -165,7 +180,11 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 7;
+    if (tableViewSwitch) {
+        return integralArray.count;
+    }else {
+        return sportArray.count;
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -180,11 +199,13 @@
     cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"我的记录分割线"]];
     cell.backgroundView.contentMode = UIViewContentModeTop;
     if (tableViewSwitch) {
-        cell.textLabel.text = @"历史";
-        cell.detailTextLabel.text = @"50";
+        IntegralGainedHistory *integralGainedHistory = integralArray[indexPath.row];
+        cell.textLabel.text = integralGainedHistory.gainedDate;
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)integralGainedHistory.integral];
     }else {
-        cell.textLabel.text = @"记录";
-        cell.detailTextLabel.text = @"2";
+        SportRecord *record = sportArray[indexPath.row];
+        cell.textLabel.text = record.sportDate;
+        cell.detailTextLabel.text = record.distanceAndTime;
     }
     
     return cell;
@@ -225,11 +246,84 @@
     }
 }
 
+/**
+ *  加载数据
+ **/
+- (void)loadDate {
+    activityIndicatorView = [[HJFActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 0.3*SCREEN_WIDTH, 0.8*0.3*SCREEN_WIDTH) andViewAlpha:0.8 andCornerRadius:8];
+    activityIndicatorView.center = self.view.center;
+    [self.view addSubview:activityIndicatorView];
+    FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
+    if ([db open]) {
+        FMResultSet *resultSet = [db executeQuery:@"select * from sportrecord"];
+        while ([resultSet next]) {
+            NSString *starttimeStr = resultSet[@"startTime"];
+            NSString *endtimeStr = resultSet[@"endTime"];
+            NSArray *starttimeArray = [starttimeStr componentsSeparatedByString:@" "];
+            CGFloat distance = [resultSet[@"distance"] floatValue];
+            NSDateFormatter *df = [[NSDateFormatter alloc] init];
+            SportRecord *record = [[SportRecord alloc] init];
+            record.sportDate = starttimeArray[0];
+            [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
+            NSTimeInterval secondTime = [self intervalFrom:[df dateFromString:starttimeStr] to:[df dateFromString:endtimeStr]];
+            NSLog(@"时间：%f\nstarttimeStr:%@", secondTime, starttimeStr);
+            NSString *time = [self intervalToTime:secondTime];
+            record.distanceAndTime = [NSString stringWithFormat:@"%.1f公里 - %@", distance/1000, time];
+            [sportArray addObject:record];
+        }
+        FMResultSet *temp = [db executeQuery:@"select * from integralgained"];
+        while ([temp next]) {
+            NSString *gaintimeStr = temp[@"gainTime"];
+            NSArray *gaintimeArray = [gaintimeStr componentsSeparatedByString:@" "];
+            int integral = [temp[@"integral"] intValue];
+            IntegralGainedHistory *integralGainedHistory = [[IntegralGainedHistory alloc] init];
+            integralGainedHistory.gainedDate = gaintimeArray[0];
+            integralGainedHistory.integral = integral;
+            [integralArray addObject:integralGainedHistory];
+        }
+        [activityIndicatorView removeFromSuperview];
+        if (!isShow) {
+            [self UILayout];
+            isShow = YES;
+        }
+    }
+    [db close];
+}
+
+/**
+ *  两个时间差
+ **/
+- (NSTimeInterval)intervalFrom:(NSDate *)earlyDate to:(NSDate *)lateDate
+{
+    NSTimeInterval early = [earlyDate timeIntervalSince1970]*1;
+    NSTimeInterval late = [lateDate timeIntervalSince1970]*1;
+    
+    NSTimeInterval cha=late-early;
+    
+    return cha;
+}
+
+/**
+ *  秒转小时
+ **/
+- (NSString *)intervalToTime:(NSTimeInterval)timeInterval {
+    int min = [[NSString stringWithFormat:@"%d", (int)timeInterval/60%60] intValue];
+    int house = [[NSString stringWithFormat:@"%d", (int)timeInterval/3600] intValue];
+    NSString *timeString;
+    if (house > 0) {
+        timeString=[NSString stringWithFormat:@"%d时%d分钟",house,min];
+    }
+    timeString = [NSString stringWithFormat:@"%d分钟", min];
+    
+    return timeString;
+}
+
 #pragma mark - Life Cycle
 - (void)viewDidLoad {
     self.view.backgroundColor = [UIColor colorWithRed:88/255.0 green:89/255.0 blue:91/255.0 alpha:1.0];
     self.extendedLayoutIncludesOpaqueBars = YES;
-    [self UILayout];
+    [self NavigationInit];
+    [self loadDate];
 }
 
 
