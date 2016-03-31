@@ -805,6 +805,7 @@
         motionTrack = temp1;
         // 已完成公里数
         beenFinishLabel.text = [NSString stringWithFormat:@"%.2f", TrackDistance/1000];
+        successFinishLabel.text = [NSString stringWithFormat:@"%.2f", self.myAppDelegate.totalTrackDistance];
         NSLog(@"暂停后的那个点：%@", self.preLocation);
     }else {
         [switchButton setImage:[UIImage imageNamed:@"暂停图标"] forState:UIControlStateNormal];

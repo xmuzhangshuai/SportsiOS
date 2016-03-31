@@ -374,6 +374,7 @@
             }
             detailsTime.text = [self intervalToTime:totalTime];
             detailsDistance.text = [NSString stringWithFormat:@"%.1f公里", totalDistance/1000];
+            myAppDelegate.totalTrackDistance = totalDistance/1000;
         }
         [db close];
     }];
