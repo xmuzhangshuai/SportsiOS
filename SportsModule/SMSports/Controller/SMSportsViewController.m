@@ -400,7 +400,6 @@
         while ([resultSet next]) {
             startTimeString = [resultSet stringForColumn:@"starttime"];
             startTimeStr = [startTimeString componentsSeparatedByString:@" "];
-            NSLog(@"%@", startTimeStr[0]);
             TrackDistance = [resultSet doubleForColumn:@"distance"];
             int sportType = [resultSet intForColumn:@"sporttype"];
             motionTrack = [resultSet stringForColumn:@"motionTrack"];
@@ -438,7 +437,6 @@
         distanceLabel.text = [NSString stringWithFormat:@"%.2fkm", TrackDistance/1000];
         [db close];
         /** 之前的运动轨迹 */
-        NSLog(@"motionTrack:%@", motionTrack);
         NSArray *motionTrackArray = [motionTrack componentsSeparatedByString:@";"];
         /** 轨迹点个数 */
         NSUInteger count = motionTrackArray.count;
@@ -564,7 +562,6 @@
         motionTrack = temp;
     }
     [self TrailRouteWithUserLocation:userLocation];
-    NSLog(@"motiontrack:%@", motionTrack);
 }
 
 /**
@@ -618,7 +615,6 @@
 - (void)TrailRouteWithUserLocation:(BMKUserLocation *)userLocation {
     if (self.preLocation) {
         CGFloat distance = [userLocation.location distanceFromLocation:self.preLocation];
-        NSLog(@"distance:%f", distance);
         if ([sportMode isEqualToString:@"跑"]) {
             if (distance < 3) {
                 return;
@@ -637,7 +633,6 @@
             TrackDistance -= distance;
         }
         distanceLabel.text = [NSString stringWithFormat:@"%.2fkm", TrackDistance/1000];
-        NSLog(@"运动距离：%f", TrackDistance/1000);
     }
     [self.locationArray addObject:userLocation.location];
     self.preLocation = userLocation.location;
@@ -655,7 +650,6 @@
     [self.locationArray enumerateObjectsUsingBlock:^(CLLocation *location, NSUInteger idx, BOOL *stop){
         BMKMapPoint locationPoint = BMKMapPointForCoordinate(location.coordinate);
         tempPoints[idx] = locationPoint;
-//        NSLog(@"idx = %ld,tempPoints X = %f Y = %f",(unsigned long)idx,tempPoints[idx].x,tempPoints[idx].y);
     }];
     if (isPause) {
         [self.colorIndex addObject:[NSNumber numberWithInt:0]];
@@ -806,7 +800,6 @@
         // 已完成公里数
         beenFinishLabel.text = [NSString stringWithFormat:@"%.2f", TrackDistance/1000];
         successFinishLabel.text = [NSString stringWithFormat:@"%.2f", self.myAppDelegate.totalTrackDistance];
-        NSLog(@"暂停后的那个点：%@", self.preLocation);
     }else {
         [switchButton setImage:[UIImage imageNamed:@"暂停图标"] forState:UIControlStateNormal];
         isBegin = YES;
@@ -823,7 +816,6 @@
         countTimeTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(countTime) userInfo:nil repeats:YES];
         // 运动中
         [self.userDefaults setBool:YES forKey:@"isSport"];
-        NSLog(@"%d", [self.userDefaults boolForKey:@"isSport"]);
     }
 }
 
@@ -835,7 +827,6 @@
     isContinue = YES;
     // 计算当前时间与暂停时时间相差多少毫秒
     pauseTime += [[NSDate date] timeIntervalSinceDate:stopTime]*1000;
-    NSLog(@"暂停时长：%d", pauseTime);
 }
 
 // 完成运动
@@ -848,7 +839,6 @@
     [self.view addSubview:waitView];
     if ([SaveDataToServer saveDateToSportScore]) {
         [self.userDefaults setBool:NO forKey:@"isSport"];
-        NSLog(@"存入服务器成功");
         
         // 显示整条运动轨迹 设置地图显示范围
         [self.bmkLocationService stopUserLocationService];
@@ -883,7 +873,6 @@
         NSTimeInterval endTimestamp = [endTime timeIntervalSince1970];
         NSString *userId = [self.userDefaults objectForKey:@"userId"];
         [self intervalSinceNow:endTime];
-        NSLog(@"userid:%@, sporttype:%@, trackdistance:%@, duration:%@, endtimes:%@", userId, sportType, [NSNumber numberWithFloat:TrackDistance], [NSNumber numberWithInt:duration], [NSNumber numberWithFloat:endTimestamp]);
         NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
                               userId, @"userId",
                               sportType, @"sportType",
@@ -974,7 +963,6 @@
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
     NSInteger interval = [zone secondsFromGMTForDate:[NSDate date]];
     startTime = [[NSDate date]  dateByAddingTimeInterval: interval];
-    NSLog(@"starttime:%@", startTime);
     /** 运动类型 */
     int sportType;
     if ([sportMode isEqualToString:@"走"]) {
@@ -1004,7 +992,6 @@
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
     NSInteger interval = [zone secondsFromGMTForDate:[NSDate date]];
     endTime = [[NSDate date]  dateByAddingTimeInterval: interval];
-    NSLog(@"完成时间：%@", endTime);
     [SaveDataToLocalDB saveDataToSportScoreTempFinallyWithEndTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance];
 }
 
@@ -1041,7 +1028,6 @@
  **/
 - (NSString *)intervalSinceNow:(NSDate *)theDate
 {
-    NSLog(@"%@", theDate);
     NSDate *nowDate = [NSDate date];
     NSTimeInterval now = [nowDate timeIntervalSince1970]*1;
     NSTimeInterval late=[theDate timeIntervalSince1970]*1;

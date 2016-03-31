@@ -266,7 +266,6 @@
             record.sportDate = starttimeArray[0];
             [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
             NSTimeInterval secondTime = [self intervalFrom:[df dateFromString:starttimeStr] to:[df dateFromString:endtimeStr]];
-            NSLog(@"时间：%f\nstarttimeStr:%@", secondTime, starttimeStr);
             NSString *time = [self intervalToTime:secondTime];
             record.distanceAndTime = [NSString stringWithFormat:@"%.1f公里 - %@", distance/1000, time];
             [sportArray addObject:record];

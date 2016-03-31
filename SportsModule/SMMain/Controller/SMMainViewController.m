@@ -93,7 +93,6 @@
         if ([userDefaults boolForKey:@"isSport"] == YES) {
             [userDefaults setBool:[self IsSport] forKey:@"isSport"];
         }
-        NSLog(@"是否运动中：%d", [userDefaults boolForKey:@"isSport"]);
     }
     return self;
 }
@@ -291,7 +290,6 @@
     FMResultSet *resultSet = [db executeQuery:@"select * from sportrecordtemp"];
     while ([resultSet next]) {
         NSArray *startTimeStr = [[resultSet stringForColumn:@"starttime"] componentsSeparatedByString:@" "];
-        NSLog(@"start%@", startTimeStr[0]);
         if ([self isToday:startTimeStr[0]]) {
             [db close];
             return  YES;
@@ -308,7 +306,6 @@
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyy-MM-dd"];
     NSString *today = [formatter stringFromDate:[NSDate date]];
-    NSLog(@"today:%@ startday:%@", today, date);
     if ([today isEqualToString:date]) {
         return YES;
     }else {

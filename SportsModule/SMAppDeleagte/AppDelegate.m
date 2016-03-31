@@ -42,15 +42,8 @@
     
     // 数据库创建
     self.dataBasePath = [self DataBasePath];
-    NSLog(@"shahe:%@", self.dataBasePath);
     [self dataBaseCreate:self.dataBasePath];
     self.userDefaults = [NSUserDefaults standardUserDefaults];
-//    if (![self.userDefaults boolForKey:@"everLaunched"]) {
-//        // 缓存字段创建
-//        [self.userDefaults setObject:@"" forKey:@"userId"];
-//        [self.userDefaults setBool:NO forKey:@"isSport"];
-//        [self.userDefaults setObject:@"" forKey:@"currentIntegral"];
-//    }
     
     // LeanCloud ID设置
     [AVOSCloud setApplicationId:@"WGUoySgrc7k8FVz2dvWNkJAd-gzGzoHsz" clientKey:@"vHarYvaUm7SuGQQSoOFGVA4m"];

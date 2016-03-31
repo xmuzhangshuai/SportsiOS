@@ -244,7 +244,6 @@
                 for (int i = 0; i < 4; i++) {
                     NSIndexPath *myIndexPath = [NSIndexPath indexPathForRow:i inSection:0];
                     if (!(myIndexPath.row == indexPath.row)) {
-                        NSLog(@"未选中");
                         HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:myIndexPath];
                         cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
                     }
@@ -262,7 +261,6 @@
                 for (int i = 0; i < 4; i++) {
                     NSIndexPath *myIndexPath = [NSIndexPath indexPathForRow:i inSection:0];
                     if (!(myIndexPath.row == indexPath.row)) {
-                        NSLog(@"未选中");
                         HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:myIndexPath];
                         cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
                     }
@@ -280,7 +278,6 @@
                 for (int i = 0; i < 4; i++) {
                     NSIndexPath *myIndexPath = [NSIndexPath indexPathForRow:i inSection:0];
                     if (!(myIndexPath.row == indexPath.row)) {
-                        NSLog(@"未选中");
                         HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:myIndexPath];
                         cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
                     }
@@ -298,7 +295,6 @@
                 for (int i = 0; i < 4; i++) {
                     NSIndexPath *myIndexPath = [NSIndexPath indexPathForRow:i inSection:0];
                     if (!(myIndexPath.row == indexPath.row)) {
-                        NSLog(@"未选中");
                         HJFSMRTTableViewCell *cell = [tableView cellForRowAtIndexPath:myIndexPath];
                         cell.imageView.image = [UIImage imageNamed:@"未选中状态图标"];
                     }
@@ -375,7 +371,6 @@
     NSNumber *unitNumber = [[NSNumber alloc] initWithInt:filter];
     NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:typeNumber, @"type", unitNumber, @"unit" , nil];
     [AVCloud callFunctionInBackground:@"GetUserTopList" withParameters:dict block:^(id object, NSError *error) {
-        NSLog(@"list:%@", object);
         NSNumber *resultCode = object[@"resultCode"];
         if ([resultCode intValue] == 200) {
             // 获取成功
@@ -395,7 +390,6 @@
                                       userScore, @"userScore",
                                       obj[@"portrait"], @"userPicUrl", nil];
                 HJFSMScore *score = [HJFSMScore scoreWithDict:dict];
-                NSLog(@"图片地址：%@", score.userPicUrl);
                 [rankArray addObject:score];
             }];
             [activityIndicatorView removeFromSuperview];

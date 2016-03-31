@@ -38,13 +38,11 @@
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
         [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
         NSDate *endTime = [df dateFromString:endTimeStr];
-        NSLog(@"%@", endTime);
         AVQuery *query = [AVQuery queryWithClassName:@"SportRecordTmp"];
         [query whereKey:@"uid" equalTo:myAppDelegate.currentUUID];
         [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
             if (objects.count == 0) {
                 // 没有此条运动记录 插入新纪录
-                NSLog(@"新的运动 往服务器插入一条新纪录");
                 NSString *uId = [resultSet stringForColumn:@"uid"];
                 NSString *userId = [resultSet stringForColumn:@"userid"];
                 int sportMode = [resultSet intForColumn:@"sporttype"];
@@ -91,7 +89,6 @@
     NSString *queryStr = [NSString stringWithFormat:@"select * from sportrecordtemp"];
     FMResultSet *resultSet = [db executeQuery:queryStr];
     while ([resultSet next]) {
-        NSLog(@"即将上传到服务器，取得本地数据");
         NSString *uId = [resultSet stringForColumn:@"uid"];
         NSString *userId = [resultSet stringForColumn:@"userid"];
         int sportMode = [resultSet intForColumn:@"sporttype"];
@@ -116,7 +113,6 @@
         isUpload = [newSport save];
     }
     [db close];
-    NSLog(@"返回运动页面");
     return isUpload;
 }
 

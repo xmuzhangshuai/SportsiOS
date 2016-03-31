@@ -105,12 +105,10 @@
             [waitView removeFromSuperview];
             NSNumber *resultCode = object[@"resultCode"];
             if ([resultCode intValue] == 200) {
-                NSLog(@"%@", object);
                 // 将用户id记录到缓存
                 NSString *currentIntegral = object[@"integral"];
                 NSString *userId = object[@"userId"];
                 if (![[userDefaults objectForKey:@"userId"] isEqualToString:userId]) {
-                    NSLog(@"bendi:%@ 登陆%@", userId, [userDefaults objectForKey:@"userId"]);
                     [userDefaults setObject:userId forKey:@"userId"];
                     [userDefaults setObject:currentIntegral forKey:@"currentIntegral"];
                     [userDefaults setBool:NO forKey:@"isSport"];
@@ -129,8 +127,6 @@
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"请输入用户识别码" delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
         [alertView show];
     }
-//    SMMainViewController *mainViewController = [[SMMainViewController alloc] init];
-//    [self.navigationController pushViewController:mainViewController animated:YES];
 }
 
 
@@ -142,31 +138,7 @@
     [self UILayout];
     self.extendedLayoutIncludesOpaqueBars = YES;
     
-    // LeanCloud测试
-//    AVObject *post = [AVObject objectWithClassName:@"TestObject"];
-//    [post setObject:@"Hello World" forKey:@"words"];
-//    [post saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-//        if (succeeded) {
-//            NSLog(@"保存成功");
-//        }
-//    }];
-    // 获取积分api测试
-//    NSNumber *typeNumber = [[NSNumber alloc] initWithInt:2];
-//    NSNumber *durationNumber = [[NSNumber alloc] initWithInt:180];
-//    NSNumber *distanceNumber = [[NSNumber alloc] initWithFloat:1230.6];
-//    NSNumber *endTimeNumber = [[NSNumber alloc] initWithLong:1458113776990];
-//    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"B3026954-DDDF-4A8C-94A2-8DAA0CBC7466", @"userId", typeNumber, @"sportType", distanceNumber, @"distance", durationNumber, @"duration", endTimeNumber, @"endTimestamp", nil];
-//    NSLog(@"%@", dict);
-//    [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
-//        NSLog(@"赢取积分信息：%@  错误信息：%@", object, error);
-//    }];
-    
-    // 获取uuid测试
-//    CFUUIDRef uuidRef = CFUUIDCreate(kCFAllocatorDefault);
-//    NSLog(@"uuid:%@", uuidRef);
-//    sleep(5);
-//    CFUUIDRef uuidref = CFUUIDCreate(kCFAllocatorDefault);
-//    NSLog(@"UUID:%@", uuidref);
+   
 }
 
 - (void)didReceiveMemoryWarning {

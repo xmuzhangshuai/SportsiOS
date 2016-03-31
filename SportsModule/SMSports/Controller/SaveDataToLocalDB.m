@@ -20,11 +20,9 @@
     query = [NSString stringWithFormat:@"update sportrecordtemp set endtime = '%@', pausetime = %d, motiontrack = '%@', distance = %f where uid = '%@'", endTime, pauseTime, motionTrack, distance, myAppDelegate.currentUUID];
     BOOL success = [db executeUpdate:query];
     if (success) {
-        NSLog(@"结束运动，数据保存到本地成功");
         [db close];
         return YES;
     }
-    NSLog(@"结束运动，数据保存到本地失败");
     [db close];
     return NO;
 }
