@@ -147,11 +147,11 @@
 #pragma mark -- 表创建
 - (BOOL)tableCreate:(FMDatabase *)dataBase {
     BOOL result = [dataBase executeUpdate:
-                   @"create table if not exists IntegralGained (uid text PRIMARY KEY, useId text NOT NULL, gainTime date Not NULL, integral int NOT NULL, gainReason int NOT NULL);"];
+                   @"create table if not exists IntegralGained (uid text PRIMARY KEY, useid text NOT NULL, gaintime date Not NULL, integral int NOT NULL, gainreason int NOT NULL);"];
     BOOL result1 = [dataBase executeUpdate:
-                    @"create table if not exists SportRecord (uid text PRIMARY KEY, userId text NOT NULL, sportType int not null, starttime date not null, endtime date not null, pausetime int, motiontrack text not null, distance float);"];
+                    @"create table if not exists SportRecord (uid text PRIMARY KEY, userid text NOT NULL, sporttype int not null, starttime date not null, endtime date not null, pausetime int, motiontrack text not null, distance float);"];
     BOOL result2 = [dataBase executeUpdate:
-                    @"create table if not exists SportRecordTemp (uid text PRIMARY KEY, userId text NOT NULL, sportType int not null, starttime date not null, endtime date not null, pausetime int, motiontrack text not null, distance float);"];
+                    @"create table if not exists SportRecordTemp (uid text PRIMARY KEY, userid text NOT NULL, sporttype int not null, starttime date not null, endtime date not null, pausetime int, motiontrack text not null, distance float);"];
     return result && result1 && result2;
 }
 

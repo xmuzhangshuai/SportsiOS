@@ -11,6 +11,7 @@
 #import "SMSize.h"
 #import "HJFActivityIndicatorView.h"
 #import "AppDelegate.h"
+#import "sys/utsname.h"
 
 /** 百度地图头文件 */
 #import <BaiduMapAPI_Map/BMKMapComponent.h>
@@ -180,6 +181,8 @@
         isContinue          = YES;
         isStopMenu          = NO;
         motionTrack         = @"";
+        duration            = 0;
+        pauseTime           = 0;
         
         self.userDefaults   = [NSUserDefaults standardUserDefaults];
         self.myAppDelegate  = [[UIApplication sharedApplication] delegate];
@@ -217,6 +220,8 @@
         motionTrack         = @"";
         
         sportMode           = sportmode;
+        duration            = 0;
+        pauseTime           = 0;
         
         self.userDefaults   = [NSUserDefaults standardUserDefaults];
         
@@ -268,13 +273,19 @@
     
     // 时间记录标签
     startTimeImageView.frame = CGRectMake(STARTTIMEIMAGEVIEW_X, STARTTIMEIMAGEVIEW_Y, STARTTIMEIMAGEVIEW_WIDTH, STARTTIMEIMAGEVIEW_WIDTH);
+    if (SCREEN_HEIGHT == 480) {
+        startTimeImageView.frame = CGRectMake(STARTTIMEIMAGEVIEW_X, 0.015*SCREEN_HEIGHT, STARTTIMEIMAGEVIEW_WIDTH, STARTTIMEIMAGEVIEW_WIDTH);
+    }
     startTimeImageView.image = [UIImage imageNamed:@"时间记录图标"];
     [detailsView addSubview:startTimeImageView];
     
     // 时间记录标签具体值
     startTimeLabel.frame = CGRectMake(STARTTIMELABEL_X, STARTTIMELABEL_Y, STARTTIMELABEL_WIDTH, STARTTIMELABEL_HEIGHT);
+    if (SCREEN_HEIGHT == 480) {
+        startTimeLabel.frame = CGRectMake(STARTTIMELABEL_X, STARTTIMEIMAGEVIEW_Y+STARTTIMEIMAGEVIEW_WIDTH, STARTTIMELABEL_WIDTH, STARTTIMELABEL_HEIGHT);
+    }
     startTimeLabel.clipsToBounds = YES;
-    startTimeLabel.layer.cornerRadius = 6;
+    startTimeLabel.layer.cornerRadius = 3;
     startTimeLabel.backgroundColor = [UIColor whiteColor];
     startTimeLabel.textAlignment = NSTextAlignmentCenter;
     startTimeLabel.font = [UIFont systemFontOfSize:12];
@@ -287,13 +298,19 @@
     
     // 计时图标
     usedTimeImageView.frame = CGRectMake(STARTTIMEIMAGEVIEW_X+SCREEN_WIDTH/3, STARTTIMEIMAGEVIEW_Y, STARTTIMEIMAGEVIEW_WIDTH, STARTTIMEIMAGEVIEW_WIDTH);
+    if (SCREEN_HEIGHT == 480) {
+        usedTimeImageView.frame = CGRectMake(STARTTIMEIMAGEVIEW_X+SCREEN_WIDTH/3, 0.015*SCREEN_HEIGHT, STARTTIMEIMAGEVIEW_WIDTH, STARTTIMEIMAGEVIEW_WIDTH);
+    }
     usedTimeImageView.image = [UIImage imageNamed:@"计时图标"];
     [detailsView addSubview:usedTimeImageView];
     
     // 计时图标标签具体值
     usedTimeLabel.frame = CGRectMake(STARTTIMELABEL_X+SCREEN_WIDTH/3, STARTTIMELABEL_Y, STARTTIMELABEL_WIDTH, STARTTIMELABEL_HEIGHT);
+    if (SCREEN_HEIGHT == 480) {
+        usedTimeLabel.frame = CGRectMake(STARTTIMELABEL_X+SCREEN_WIDTH/3, STARTTIMEIMAGEVIEW_Y+STARTTIMEIMAGEVIEW_WIDTH, STARTTIMELABEL_WIDTH, STARTTIMELABEL_HEIGHT);
+    }
     usedTimeLabel.clipsToBounds = YES;
-    usedTimeLabel.layer.cornerRadius = 6;
+    usedTimeLabel.layer.cornerRadius = 3;
     usedTimeLabel.backgroundColor = [UIColor whiteColor];
     usedTimeLabel.textAlignment = NSTextAlignmentCenter;
     usedTimeLabel.font = [UIFont systemFontOfSize:12];
@@ -306,13 +323,19 @@
     
     // 距离图标
     distanceImageView.frame = CGRectMake(STARTTIMEIMAGEVIEW_X+2*SCREEN_WIDTH/3, STARTTIMEIMAGEVIEW_Y, STARTTIMEIMAGEVIEW_WIDTH, STARTTIMEIMAGEVIEW_WIDTH);
+    if (SCREEN_HEIGHT == 480) {
+        distanceImageView.frame = CGRectMake(STARTTIMEIMAGEVIEW_X+2*SCREEN_WIDTH/3, 0.015*SCREEN_HEIGHT, STARTTIMEIMAGEVIEW_WIDTH, STARTTIMEIMAGEVIEW_WIDTH);
+    }
     distanceImageView.image = [UIImage imageNamed:@"长度记录图标"];
     [detailsView addSubview:distanceImageView];
     
     // 距离图标标签具体值
     distanceLabel.frame = CGRectMake(STARTTIMELABEL_X+2*SCREEN_WIDTH/3, STARTTIMELABEL_Y, STARTTIMELABEL_WIDTH, STARTTIMELABEL_HEIGHT);
+    if (SCREEN_HEIGHT == 480) {
+        distanceLabel.frame = CGRectMake(STARTTIMELABEL_X+2*SCREEN_WIDTH/3, STARTTIMEIMAGEVIEW_Y+STARTTIMEIMAGEVIEW_WIDTH, STARTTIMELABEL_WIDTH, STARTTIMELABEL_HEIGHT);
+    }
     distanceLabel.clipsToBounds = YES;
-    distanceLabel.layer.cornerRadius = 6;
+    distanceLabel.layer.cornerRadius = 3;
     distanceLabel.backgroundColor = [UIColor whiteColor];
     distanceLabel.textAlignment = NSTextAlignmentCenter;
     distanceLabel.font = [UIFont systemFontOfSize:12];
@@ -872,7 +895,7 @@
         }
         NSTimeInterval endTimestamp = [endTime timeIntervalSince1970];
         NSString *userId = [self.userDefaults objectForKey:@"userId"];
-        [self intervalSinceNow:endTime];
+        [self intervalSinceNow:startTime];
         NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
                               userId, @"userId",
                               sportType, @"sportType",
@@ -880,6 +903,7 @@
                               [NSNumber numberWithInt:duration], @"duration",
                               [NSNumber numberWithLong:endTimestamp], @"endTimestamp",
                               nil];
+
         /** 请求服务器接口 */
         [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
             NSNumber *resultCode = object[@"resultCode"];
@@ -893,14 +917,15 @@
                 /** 将获得积分结果写入本地数据库 */
                 [SaveDataToLocalDB saveDataToIntegralGained:self.myAppDelegate.currentUUID UserId:userId GainTime:endTime Integral:integralNumber GainReason:1];
             }else {
+                [waitView removeFromSuperview];
                 NSString *errorMessage = object[@"errorMessage"];
                 UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:errorMessage delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
                 alertView.tag = 1;
                 [alertView show];
             }
         }];
-        
     }else {
+        [waitView removeFromSuperview];
         // 提示保存失败
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"保存数据失败，请重试" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
         [alertView show];
@@ -1028,9 +1053,13 @@
  **/
 - (NSString *)intervalSinceNow:(NSDate *)theDate
 {
-    NSDate *nowDate = [NSDate date];
-    NSTimeInterval now = [nowDate timeIntervalSince1970]*1;
-    NSTimeInterval late=[theDate timeIntervalSince1970]*1;
+    NSDate *date = [NSDate date];
+    NSTimeZone *zone = [NSTimeZone systemTimeZone];
+    NSInteger interval = [zone secondsFromGMTForDate: date];
+    NSDate *localeDate = [date  dateByAddingTimeInterval: interval];
+    
+    NSTimeInterval now = [localeDate timeIntervalSince1970];
+    NSTimeInterval late=[theDate timeIntervalSince1970];
     
     NSTimeInterval cha=now-late;
     
