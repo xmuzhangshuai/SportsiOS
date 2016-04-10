@@ -105,6 +105,8 @@
             [waitView removeFromSuperview];
             NSNumber *resultCode = object[@"resultCode"];
             if ([resultCode intValue] == 200) {
+                // 记录已登陆
+                [userDefaults setBool:YES forKey:@"isLogin"];
                 // 将用户id记录到缓存
                 NSString *currentIntegral = object[@"integral"];
                 NSString *userId = object[@"userId"];
@@ -137,8 +139,14 @@
     self.view.backgroundColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0];
     [self UILayout];
     self.extendedLayoutIncludesOpaqueBars = YES;
-    
-   
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if ([userDefaults objectForKey:@"isLogin"]) {
+        SMMainViewController *mainViewController = [[SMMainViewController alloc] init];
+        [self.navigationController pushViewController:mainViewController animated:YES];
+    }
 }
 
 - (void)didReceiveMemoryWarning {

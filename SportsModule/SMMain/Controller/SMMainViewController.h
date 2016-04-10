@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SMMainViewController : UIViewController
+@interface SMMainViewController : UIViewController <UIAlertViewDelegate>
 
 @end

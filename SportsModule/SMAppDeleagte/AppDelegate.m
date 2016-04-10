@@ -40,9 +40,14 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
+    if (![self.userDefaults boolForKey:@"everLaunch"]) {
+        [self.userDefaults setBool:NO forKey:@"isLogin"];
+    }
+    
     // 数据库创建
     self.dataBasePath = [self DataBasePath];
     [self dataBaseCreate:self.dataBasePath];
+    NSLog(@"shahe:%@", self.dataBasePath);
     self.userDefaults = [NSUserDefaults standardUserDefaults];
     
     // LeanCloud ID设置

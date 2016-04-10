@@ -207,6 +207,7 @@
         cell.textLabel.text = record.sportDate;
         cell.detailTextLabel.text = record.distanceAndTime;
     }
+    cell.detailTextLabel.textColor = [UIColor blackColor];
     
     return cell;
 }
@@ -267,16 +268,19 @@
             [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
             NSTimeInterval secondTime = [self intervalFrom:[df dateFromString:starttimeStr] to:[df dateFromString:endtimeStr]];
             NSString *time = [self intervalToTime:secondTime];
-            record.distanceAndTime = [NSString stringWithFormat:@"%.1f公里 - %@", distance/1000, time];
+            record.distanceAndTime = [NSString stringWithFormat:@"%.2f公里 - %@", distance/1000, time];
             [sportArray addObject:record];
         }
         FMResultSet *temp = [db executeQuery:@"select * from integralgained"];
         while ([temp next]) {
-            NSString *gaintimeStr = temp[@"gainTime"];
-            NSArray *gaintimeArray = [gaintimeStr componentsSeparatedByString:@" "];
+            NSString *gaintimeStr = temp[@"gaintime"];
+            NSLog(@"gain:%@", gaintimeStr);
+//            NSArray *gaintimeArray = [gaintimeStr componentsSeparatedByString:@" "];
+            NSString *gaintime;
+            gaintime = [gaintimeStr substringToIndex:16];
             int integral = [temp[@"integral"] intValue];
             IntegralGainedHistory *integralGainedHistory = [[IntegralGainedHistory alloc] init];
-            integralGainedHistory.gainedDate = gaintimeArray[0];
+            integralGainedHistory.gainedDate = gaintime;
             integralGainedHistory.integral = integral;
             [integralArray addObject:integralGainedHistory];
         }
@@ -306,13 +310,17 @@
  *  秒转小时
  **/
 - (NSString *)intervalToTime:(NSTimeInterval)timeInterval {
+    int sec = [[NSString stringWithFormat:@"%d", (int)timeInterval%60] intValue];
     int min = [[NSString stringWithFormat:@"%d", (int)timeInterval/60%60] intValue];
     int house = [[NSString stringWithFormat:@"%d", (int)timeInterval/3600] intValue];
     NSString *timeString;
     if (house > 0) {
         timeString=[NSString stringWithFormat:@"%d时%d分钟",house,min];
+    }else if (min > 0) {
+        timeString = [NSString stringWithFormat:@"%d分钟", min];
+    }else {
+        timeString = [NSString stringWithFormat:@"%d秒钟", sec];
     }
-    timeString = [NSString stringWithFormat:@"%d分钟", min];
     
     return timeString;
 }

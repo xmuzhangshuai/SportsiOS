@@ -55,6 +55,7 @@
     UIButton    *runButton;
     UIButton    *walkButton;
     UIButton    *bikeButton;
+    int         sportType;          // 运动类型
     UIImageView *arrowImageView;     // 箭头图片
 
     HJFActivityIndicatorView *activityIndicatorView;
@@ -177,19 +178,19 @@
     [runButton setImage:[UIImage imageNamed:@"跑图标"] forState:UIControlStateNormal];
     [runButton setImage:[UIImage imageNamed:@"跑图标(点击状态)"] forState:UIControlStateHighlighted];
     runButton.backgroundColor = [UIColor clearColor];
-    [runButton addTarget:self action:@selector(chooseRun) forControlEvents:UIControlEventTouchUpInside];
+    [runButton addTarget:self action:@selector(gotosport2) forControlEvents:UIControlEventTouchUpInside];
     
     walkButton.frame = CGRectMake(0, 0, 1, 1);
     walkButton.center = CGPointMake(CENTER_X, WALKBUTTON_CENTER_Y);
     [walkButton setImage:[UIImage imageNamed:@"走图标"] forState:UIControlStateNormal];
     [walkButton setImage:[UIImage imageNamed:@"走图标(点击状态)"] forState:UIControlStateHighlighted];
-    [walkButton addTarget:self action:@selector(chooseWalk) forControlEvents:UIControlEventTouchUpInside];
+    [walkButton addTarget:self action:@selector(gotosport1) forControlEvents:UIControlEventTouchUpInside];
     
     bikeButton.frame = CGRectMake(0, 0, 1, 1);
     bikeButton.center = CGPointMake(CENTER_X, BIKEBUTTON_CENTER_Y);
     [bikeButton setImage:[UIImage imageNamed:@"骑图标"] forState:UIControlStateNormal];
     [bikeButton setImage:[UIImage imageNamed:@"骑图标(点击状态)"] forState:UIControlStateHighlighted];
-    [bikeButton addTarget:self action:@selector(chooseBike) forControlEvents:UIControlEventTouchUpInside];
+    [bikeButton addTarget:self action:@selector(gotosport3) forControlEvents:UIControlEventTouchUpInside];
     
     arrowImageView.frame = CGRectMake(0, 0, 1, 1);
     arrowImageView.center = CGPointMake(CENTER_X, ARROW_CENTER_Y);
@@ -252,6 +253,27 @@
     [self.navigationController pushViewController:sportViewController animated:YES];
 }
 
+- (void)gotosport1 {
+    sportType = 1;
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"是否开始运动" delegate:self cancelButtonTitle:@"是" otherButtonTitles:@"否", nil];
+    alertView.tag = 0;
+    [alertView show];
+}
+
+- (void)gotosport2 {
+    sportType = 2;
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"是否开始运动" delegate:self cancelButtonTitle:@"是" otherButtonTitles:@"否", nil];
+    alertView.tag = 1;
+    [alertView show];
+}
+
+- (void)gotosport3 {
+    sportType = 3;
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"是否开始运动" delegate:self cancelButtonTitle:@"是" otherButtonTitles:@"否", nil];
+    alertView.tag = 2;
+    [alertView show];
+}
+
 - (void)chooseRun {
     SMSportsViewController *sportsViewController = [[SMSportsViewController alloc] initWithSport:@"跑"];
     [self.navigationController pushViewController:sportsViewController animated:YES];
@@ -268,7 +290,15 @@
 }
 
 - (void)toLoginView {
-    [self.navigationController popViewControllerAnimated:YES];
+    if ([userDefaults boolForKey:@"isSport"]) {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"您正在运动中，是否退出" delegate:self cancelButtonTitle:@"是" otherButtonTitles:@"否", nil];
+        alertView.tag = 3;
+        [alertView show];
+    }else {
+        [userDefaults setObject:@"" forKey:@"userId"];
+        [userDefaults setBool:NO forKey:@"isLogin"];
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 - (void)toMyRecord {
@@ -329,8 +359,10 @@
                 NSString *uid = temp[@"uid"];
                 NSString *userid = temp[@"useId"];
                 NSDate *gaintime = temp[@"gainTime"];
+                NSString *gaintime1 = temp[@"gainTime"];
                 int integral = [temp[@"integral"] intValue];
                 int gainreason = [temp[@"gainReason"] intValue];
+                NSLog(@"gaintime:%@  gaintime:%@", gaintime, gaintime1);
                 [db executeUpdate:[NSString stringWithFormat:@"insert into integralgained (uid, useid, gaintime, integral, gainreason) values ('%@', '%@', '%@', %d, %d)", uid, userid, gaintime, integral, gainreason]];
             }
             [activityIndicatorView removeFromSuperview];
@@ -360,6 +392,7 @@
                 int pausetime = [temp[@"pauseTime"] intValue];
                 NSString *motiontrack = temp[@"motionTrack"];
                 CGFloat distance = [temp[@"distance"] floatValue];
+                NSLog(@"starttime:%@ endtime%@", starttime, endtime);
                 [db executeUpdate:[NSString stringWithFormat:@"insert into sportrecord (uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance) values ('%@', '%@', %d, '%@', '%@', %d, '%@', %f)", uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance]];
                 totalTime += [self intervalFrom:starttime to:endtime];
                 totalDistance += distance;
@@ -403,6 +436,27 @@
     return timeString;
 }
 
+#pragma mark - uialertviewdelegate
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (alertView.tag == 3) {
+        if (buttonIndex == 0) {
+            [userDefaults setObject:@"" forKey:@"userId"];
+            [userDefaults setBool:NO forKey:@"isLogin"];
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+    }else {
+        if (buttonIndex == 0) {
+            if (sportType == 1) {
+                [self chooseWalk];
+            }else if(sportType == 2) {
+                [self chooseRun];
+            }else {
+                [self chooseBike];
+            }
+        }
+    }
+}
+
 #pragma mark - Life Cycle
 - (void)viewDidLoad {
     self.view.backgroundColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0];
@@ -420,14 +474,17 @@
     [UINavigationBar appearance].translucent = NO;
     if (![userDefaults boolForKey:@"isSport"]) {
         [KButton setImage:[UIImage imageNamed:@"K图标"] forState:UIControlStateNormal];
+        [KButton removeTarget:self action:@selector(toMapView) forControlEvents:UIControlEventTouchUpInside];
         [KButton addTarget:self action:@selector(toSportChoice) forControlEvents:UIControlEventTouchUpInside];
     }else {
         [KButton setImage:[UIImage imageNamed:@"运动中图标"] forState:UIControlStateNormal];
+        [KButton removeTarget:self action:@selector(toSportChoice) forControlEvents:UIControlEventTouchUpInside];
         [KButton addTarget:self action:@selector(toMapView) forControlEvents:UIControlEventTouchUpInside];
     }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     [self hiddenMenu];
 }
 @end

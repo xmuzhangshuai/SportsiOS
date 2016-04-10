@@ -36,17 +36,21 @@
         CGFloat trackDistance = [resultSet doubleForColumn:@"distance"];
         NSString *endTimeStr = [resultSet stringForColumn:@"endTime"];
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
+        [df setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
         [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
         NSDate *endTime = [df dateFromString:endTimeStr];
+        NSString *uId = [resultSet stringForColumn:@"uid"];
+        NSString *userId = [resultSet stringForColumn:@"userid"];
+        int sportMode = [resultSet intForColumn:@"sporttype"];
+        NSString *startTimeStr = [resultSet stringForColumn:@"starttime"];
+        NSLog(@"starttimestr:%@", startTimeStr);
+        NSDate *startTime = [df dateFromString:startTimeStr];
+        NSLog(@"starttime:%@", startTime);
         AVQuery *query = [AVQuery queryWithClassName:@"SportRecordTmp"];
         [query whereKey:@"uid" equalTo:myAppDelegate.currentUUID];
         [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
             if (objects.count == 0) {
                 // 没有此条运动记录 插入新纪录
-                NSString *uId = [resultSet stringForColumn:@"uid"];
-                NSString *userId = [resultSet stringForColumn:@"userid"];
-                int sportMode = [resultSet intForColumn:@"sporttype"];
-                NSDate *startTime = [resultSet dateForColumn:@"starttime"];
                 AVObject *newSport = [AVObject objectWithClassName:@"SportRecordTmp"];
                 [newSport setObject:uId forKey:@"uid"];
                 [newSport setObject:userId forKey:@"userID"];
@@ -98,10 +102,12 @@
         CGFloat trackDistance = [resultSet doubleForColumn:@"distance"];
         NSString *endTimeStr = [resultSet stringForColumn:@"endtime"];
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
-        [df setDateFormat:@"yyyy-HH-dd HH:mm:ss +0000"];
+        [df setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+        [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
         NSDate *startTime = [df dateFromString:startTimeStr];
         NSDate *endTime = [df dateFromString:endTimeStr];
         AVObject *newSport = [AVObject objectWithClassName:@"SportRecord"];
+        NSLog(@"starttime:%@ endtime:%@", startTime, endTime);
         [newSport setObject:uId forKey:@"uid"];
         [newSport setObject:userId forKey:@"userID"];
         [newSport setObject:[NSNumber numberWithInt:sportMode] forKey:@"sportType"];
