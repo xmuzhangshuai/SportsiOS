@@ -76,6 +76,8 @@
 }
 
 + (BOOL)saveDateToSportScore {
+    /** 判断是否已经将本次运动记录上传到服务器 防止重复上传 */
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     /** 记录是否更新服务器成功 */
     BOOL isUpload = false;
     AppDelegate *myAppDelegate = [[UIApplication sharedApplication] delegate];
@@ -106,17 +108,22 @@
         [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
         NSDate *startTime = [df dateFromString:startTimeStr];
         NSDate *endTime = [df dateFromString:endTimeStr];
-        AVObject *newSport = [AVObject objectWithClassName:@"SportRecord"];
-        NSLog(@"starttime:%@ endtime:%@", startTime, endTime);
-        [newSport setObject:uId forKey:@"uid"];
-        [newSport setObject:userId forKey:@"userID"];
-        [newSport setObject:[NSNumber numberWithInt:sportMode] forKey:@"sportType"];
-        [newSport setObject:startTime forKey:@"startTime"];
-        [newSport setObject:endTime forKey:@"endTime"];
-        [newSport setObject:[NSNumber numberWithInt:pauseTime] forKey:@"pauseTime"];
-        [newSport setObject:motionTrack forKey:@"motionTrack"];
-        [newSport setObject:[NSNumber numberWithFloat:trackDistance] forKey:@"distance"];
-        isUpload = [newSport save];
+        if (![userDefaults boolForKey:@"isUploadRecord"]) {
+            AVObject *newSport = [AVObject objectWithClassName:@"SportRecord"];
+            NSLog(@"starttime:%@ endtime:%@", startTime, endTime);
+            [newSport setObject:uId forKey:@"uid"];
+            [newSport setObject:userId forKey:@"userID"];
+            [newSport setObject:[NSNumber numberWithInt:sportMode] forKey:@"sportType"];
+            [newSport setObject:startTime forKey:@"startTime"];
+            [newSport setObject:endTime forKey:@"endTime"];
+            [newSport setObject:[NSNumber numberWithInt:pauseTime] forKey:@"pauseTime"];
+            [newSport setObject:motionTrack forKey:@"motionTrack"];
+            [newSport setObject:[NSNumber numberWithFloat:trackDistance] forKey:@"distance"];
+            isUpload = [newSport save];
+            if (isUpload) {
+                [userDefaults setBool:YES forKey:@"isUploadRecord"];
+            }
+        }
     }
     [db close];
     return isUpload;

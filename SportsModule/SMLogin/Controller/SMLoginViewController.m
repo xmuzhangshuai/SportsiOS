@@ -96,6 +96,7 @@
  *  前往主界面
  */
 - (void)toMainView {
+    loginButton.enabled = NO;
     HJFActivityIndicatorView *waitView = [[HJFActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 0.3*SCREEN_WIDTH, 0.8*0.3*SCREEN_WIDTH) andViewAlpha:0.8 andCornerRadius:8];
     waitView.center = self.view.center;
     [self.view addSubview:waitView];
@@ -105,6 +106,7 @@
             [waitView removeFromSuperview];
             NSNumber *resultCode = object[@"resultCode"];
             if ([resultCode intValue] == 200) {
+                loginButton.enabled = YES;
                 // 记录已登陆
                 [userDefaults setBool:YES forKey:@"isLogin"];
                 // 将用户id记录到缓存
@@ -125,10 +127,12 @@
             }
         }];
     }else {
+        loginButton.enabled = YES;
         [waitView removeFromSuperview];
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"请输入用户识别码" delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
         [alertView show];
     }
+    loginButton.enabled = YES;
 }
 
 
@@ -143,7 +147,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if ([userDefaults objectForKey:@"isLogin"]) {
+    if ([userDefaults boolForKey:@"isLogin"]) {
         SMMainViewController *mainViewController = [[SMMainViewController alloc] init];
         [self.navigationController pushViewController:mainViewController animated:YES];
     }

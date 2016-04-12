@@ -25,22 +25,6 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SportsModule/SMSports/Controller/SMSportsViewController.m"
-            timestampString = "481977787.852657"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "967"
-            endingLineNumber = "967"
-            landmarkName = "-doneSport"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "SportsModule/SMSports/Controller/SaveDataToLocalDB.m"
             timestampString = "481777982.371381"
             startingColumnNumber = "9223372036854775807"
@@ -65,54 +49,6 @@
             endingLineNumber = "20"
             landmarkName = "+saveDateToSportScoreTemp"
             landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SportsModule/SMSports/Controller/SMSportsViewController.m"
-            timestampString = "481977787.852657"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "949"
-            endingLineNumber = "949"
-            landmarkName = "-doneSport"
-            landmarkType = "5">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[SMSportsViewController doneSport]"
-                  moduleName = "SportsModule"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/H_jf/Desktop/%E5%B0%8F%E7%8A%80%E7%89%9B/SportsModule/SportsModule/SMSports/Controller/SMSportsViewController.m"
-                  timestampString = "481709003.95384"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "909"
-                  endingLineNumber = "909"
-                  offsetFromSymbolStart = "2904">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__35-[SMSportsViewController doneSport]_block_invoke"
-                  moduleName = "SportsModule"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/H_jf/Desktop/%E5%B0%8F%E7%8A%80%E7%89%9B/SportsModule/SportsModule/SMSports/Controller/SMSportsViewController.m"
-                  timestampString = "481709003.954108"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "909"
-                  endingLineNumber = "909"
-                  offsetFromSymbolStart = "0">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -202,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SportsModule/SMSports/Controller/SMSportsViewController.m"
-            timestampString = "481977787.852657"
+            timestampString = "482037697.606444"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "886"
-            endingLineNumber = "886"
+            startingLineNumber = "889"
+            endingLineNumber = "889"
             landmarkName = "-continueSport"
             landmarkType = "5">
          </BreakpointContent>
@@ -218,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SportsModule/SMLogin/Controller/SMLoginViewController.m"
-            timestampString = "481981792.063282"
+            timestampString = "482035664.477672"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "115"
-            endingLineNumber = "115"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
             landmarkName = "-toMainView"
             landmarkType = "5">
          </BreakpointContent>
@@ -234,11 +170,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SportsModule/SMLogin/Controller/SMLoginViewController.m"
-            timestampString = "481981792.063282"
+            timestampString = "482035664.477672"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "116"
-            endingLineNumber = "116"
+            startingLineNumber = "118"
+            endingLineNumber = "118"
             landmarkName = "-toMainView"
             landmarkType = "5">
          </BreakpointContent>
@@ -282,11 +218,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SportsModule/SMLogin/Controller/SMLoginViewController.m"
-            timestampString = "481981792.063282"
+            timestampString = "482035664.477672"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "113"
-            endingLineNumber = "113"
+            startingLineNumber = "115"
+            endingLineNumber = "115"
             landmarkName = "-toMainView"
             landmarkType = "5">
          </BreakpointContent>
@@ -330,11 +266,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SportsModule/SMSports/Controller/SMSportsViewController.m"
-            timestampString = "481980674.178519"
+            timestampString = "482075854.840463"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1101"
-            endingLineNumber = "1101"
+            startingLineNumber = "1123"
+            endingLineNumber = "1123"
             landmarkName = "-countTime"
             landmarkType = "5">
          </BreakpointContent>
@@ -368,22 +304,6 @@
             startingLineNumber = "305"
             endingLineNumber = "305"
             landmarkName = "-UILayout"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SportsModule/SMSports/Controller/SaveDataToServer.m"
-            timestampString = "481780750.998207"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "110"
-            endingLineNumber = "110"
-            landmarkName = "+saveDateToSportScore"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -458,44 +378,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SportsModule/SMSports/Controller/SMSportsViewController.m"
-            timestampString = "481980674.178519"
+            timestampString = "482075854.840463"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1058"
-            endingLineNumber = "1058"
+            startingLineNumber = "1071"
+            endingLineNumber = "1071"
             landmarkName = "-saveRecordToTempFirst"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SportsModule/SMSports/Controller/SMSportsViewController.m"
-            timestampString = "481977787.852657"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "946"
-            endingLineNumber = "946"
-            landmarkName = "-doneSport"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SportsModule/SMSports/Controller/SMSportsViewController.m"
-            timestampString = "481977787.852657"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "933"
-            endingLineNumber = "933"
-            landmarkName = "-doneSport"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -564,11 +452,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SportsModule/SMMain/Controller/SMMainViewController.m"
-            timestampString = "481981311.543016"
+            timestampString = "482055622.98262"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "474"
-            endingLineNumber = "474"
+            startingLineNumber = "473"
+            endingLineNumber = "473"
             landmarkName = "-viewWillAppear:"
             landmarkType = "5">
          </BreakpointContent>

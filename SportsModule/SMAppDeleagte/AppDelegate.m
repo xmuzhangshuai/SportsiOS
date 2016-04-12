@@ -42,6 +42,7 @@
     
     if (![self.userDefaults boolForKey:@"everLaunch"]) {
         [self.userDefaults setBool:NO forKey:@"isLogin"];
+        [self.userDefaults setBool:NO forKey:@"isUploadRecord"];
     }
     
     // 数据库创建

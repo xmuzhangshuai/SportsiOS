@@ -135,12 +135,12 @@
     
     detailsTime.frame = CGRectMake(0, 0, DETAILSTIME_WIDTH, DETAILSTIME_HEIFHT);
     detailsTime.center = CGPointMake(CENTER_X, DETAILSTIME_CENTER_Y);
-    detailsTime.text = @"8小时23分钟";
+    detailsTime.text = @"0小时0分钟";
     detailsTime.textAlignment = NSTextAlignmentCenter;
     
     detailsDistance.frame = CGRectMake(0, 0, DETAILSTIME_WIDTH, DETAILSTIME_HEIFHT);
     detailsDistance.center = CGPointMake(CENTER_X, DETAILSDISTANCE_CENTER_Y);
-    detailsDistance.text = @"62.8公里";
+    detailsDistance.text = @"0公里";
     detailsDistance.textAlignment = NSTextAlignmentCenter;
     
     KButton.frame = CGRectMake(0, 0, KBUTTON_WIDTH, KBUTTON_WIDTH);
@@ -362,7 +362,6 @@
                 NSString *gaintime1 = temp[@"gainTime"];
                 int integral = [temp[@"integral"] intValue];
                 int gainreason = [temp[@"gainReason"] intValue];
-                NSLog(@"gaintime:%@  gaintime:%@", gaintime, gaintime1);
                 [db executeUpdate:[NSString stringWithFormat:@"insert into integralgained (uid, useid, gaintime, integral, gainreason) values ('%@', '%@', '%@', %d, %d)", uid, userid, gaintime, integral, gainreason]];
             }
             [activityIndicatorView removeFromSuperview];
@@ -374,28 +373,28 @@
         [db close];
     }];
     
-    
+    FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
     AVQuery *sportQuery = [AVQuery queryWithClassName:@"SportRecord"];
     [sportQuery whereKey:@"userID" containsString:[userDefaults objectForKey:@"userId"]];
     [sportQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         // 同步运动记录表
         /** 先删除原先的数据 */
-        FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
         if ([db open]) {
-            [db executeUpdate:@"delete from sportrecord"];
-            for (AVObject *temp in objects) {
-                NSString *uid = temp[@"uid"];
-                NSString *userid = temp[@"userID"];
-                int sporttype = [temp[@"sportType"] intValue];
-                NSDate *starttime = temp[@"startTime"];
-                NSDate *endtime = temp[@"endTime"];
-                int pausetime = [temp[@"pauseTime"] intValue];
-                NSString *motiontrack = temp[@"motionTrack"];
-                CGFloat distance = [temp[@"distance"] floatValue];
-                NSLog(@"starttime:%@ endtime%@", starttime, endtime);
-                [db executeUpdate:[NSString stringWithFormat:@"insert into sportrecord (uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance) values ('%@', '%@', %d, '%@', '%@', %d, '%@', %f)", uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance]];
-                totalTime += [self intervalFrom:starttime to:endtime];
-                totalDistance += distance;
+            if ([db executeUpdate:@"delete from sportrecord"]) {
+                for (AVObject *temp in objects) {
+                    NSString *uid = temp[@"uid"];
+                    NSString *userid = temp[@"userID"];
+                    int sporttype = [temp[@"sportType"] intValue];
+                    NSDate *starttime = temp[@"startTime"];
+                    NSDate *endtime = temp[@"endTime"];
+                    int pausetime = [temp[@"pauseTime"] intValue];
+                    NSString *motiontrack = temp[@"motionTrack"];
+                    CGFloat distance = [temp[@"distance"] floatValue];
+                    [db executeUpdate:[NSString stringWithFormat:@"insert into sportrecord (uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance) values ('%@', '%@', %d, '%@', '%@', %d, '%@', %f)", uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance]];
+//                    NSLog(@"服务器数据：%@\n\n\n", temp);
+                    totalTime += [self intervalFrom:starttime to:endtime];
+                    totalDistance += distance;
+                }
             }
             [activityIndicatorView removeFromSuperview];
             if (!isShow) {
@@ -438,10 +437,10 @@
 
 #pragma mark - uialertviewdelegate
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    [userDefaults setBool:NO forKey:@"isLogin"];
     if (alertView.tag == 3) {
         if (buttonIndex == 0) {
             [userDefaults setObject:@"" forKey:@"userId"];
-            [userDefaults setBool:NO forKey:@"isLogin"];
             [self.navigationController popViewControllerAnimated:YES];
         }
     }else {
