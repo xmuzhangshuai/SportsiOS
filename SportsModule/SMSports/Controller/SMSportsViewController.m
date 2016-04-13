@@ -465,7 +465,9 @@
         distanceLabel.text = [NSString stringWithFormat:@"%.2fkm", TrackDistance/1000];
         [db close];
         /** 之前的运动轨迹 */
-        NSArray *motionTrackArray = [motionTrack componentsSeparatedByString:@";"];
+        NSArray *motionTrackArray1 = [motionTrack componentsSeparatedByString:@";"];
+        NSMutableArray *motionTrackArray = [NSMutableArray arrayWithArray:motionTrackArray1];
+        [motionTrackArray removeLastObject];
         /** 轨迹点个数 */
         NSUInteger count = motionTrackArray.count;
         NSLog(@"count:%lu", (unsigned long)count);
@@ -873,7 +875,7 @@
         // 记录暂停时间点
         stopTime = [NSDate date];
         // 暂停后的那个点
-        NSString *temp = [STOPMARK stringByAppendingString:[NSString stringWithFormat:@"Lon%fLat%f", self.preLocation.coordinate.longitude, self.preLocation.coordinate.latitude]];
+        NSString *temp = [STOPMARK stringByAppendingString:[NSString stringWithFormat:@"Lon%fLat%f;", self.preLocation.coordinate.longitude, self.preLocation.coordinate.latitude]];
         NSString *temp1 = [motionTrack stringByAppendingString:temp];
         motionTrack = temp1;
     }else {
@@ -1157,6 +1159,7 @@
     
     /** 真实的运动时间 */
     duration = cha-pauseTime;
+    NSLog(@"真是运动时间：%d", duration);
     
     int sen = [[NSString stringWithFormat:@"%d", (int)cha%60] intValue];
     

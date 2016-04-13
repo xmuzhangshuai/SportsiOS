@@ -109,6 +109,7 @@
                 loginButton.enabled = YES;
                 // 记录已登陆
                 [userDefaults setBool:YES forKey:@"isLogin"];
+                NSLog(@"登陆后记录是否登陆：%d", [userDefaults boolForKey:@"isLogin"]);
                 // 将用户id记录到缓存
                 NSString *currentIntegral = object[@"integral"];
                 NSString *userId = object[@"userId"];
@@ -147,6 +148,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    NSLog(@"login:%d", [userDefaults boolForKey:@"isLogin"]);
     if ([userDefaults boolForKey:@"isLogin"]) {
         SMMainViewController *mainViewController = [[SMMainViewController alloc] init];
         [self.navigationController pushViewController:mainViewController animated:YES];

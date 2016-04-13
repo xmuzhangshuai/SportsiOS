@@ -39,17 +39,19 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    
-    if (![self.userDefaults boolForKey:@"everLaunch"]) {
+    self.userDefaults = [NSUserDefaults standardUserDefaults];
+    if (![self.userDefaults boolForKey:@"everLaunched"]) {
         [self.userDefaults setBool:NO forKey:@"isLogin"];
         [self.userDefaults setBool:NO forKey:@"isUploadRecord"];
+        [self.userDefaults setObject:@"00:00:00" forKey:@"usedTime"];
+        [self.userDefaults setBool:YES forKey:@"everLaunched"];
     }
     
     // 数据库创建
     self.dataBasePath = [self DataBasePath];
     [self dataBaseCreate:self.dataBasePath];
     NSLog(@"shahe:%@", self.dataBasePath);
-    self.userDefaults = [NSUserDefaults standardUserDefaults];
+    
     
     // LeanCloud ID设置
     [AVOSCloud setApplicationId:@"WGUoySgrc7k8FVz2dvWNkJAd-gzGzoHsz" clientKey:@"vHarYvaUm7SuGQQSoOFGVA4m"];

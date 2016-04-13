@@ -437,8 +437,8 @@
 
 #pragma mark - uialertviewdelegate
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    [userDefaults setBool:NO forKey:@"isLogin"];
     if (alertView.tag == 3) {
+        [userDefaults setBool:NO forKey:@"isLogin"];
         if (buttonIndex == 0) {
             [userDefaults setObject:@"" forKey:@"userId"];
             [self.navigationController popViewControllerAnimated:YES];
