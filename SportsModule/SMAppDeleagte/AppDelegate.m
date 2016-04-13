@@ -50,7 +50,6 @@
     // 数据库创建
     self.dataBasePath = [self DataBasePath];
     [self dataBaseCreate:self.dataBasePath];
-    NSLog(@"shahe:%@", self.dataBasePath);
     
     
     // LeanCloud ID设置

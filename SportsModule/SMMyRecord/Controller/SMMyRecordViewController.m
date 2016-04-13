@@ -274,7 +274,6 @@
         FMResultSet *temp = [db executeQuery:@"select * from integralgained"];
         while ([temp next]) {
             NSString *gaintimeStr = temp[@"gaintime"];
-            NSLog(@"gain:%@", gaintimeStr);
 //            NSArray *gaintimeArray = [gaintimeStr componentsSeparatedByString:@" "];
             NSString *gaintime;
             gaintime = [gaintimeStr substringToIndex:16];

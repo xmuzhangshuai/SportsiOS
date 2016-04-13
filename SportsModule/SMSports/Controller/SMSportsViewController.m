@@ -470,8 +470,6 @@
         [motionTrackArray removeLastObject];
         /** 轨迹点个数 */
         NSUInteger count = motionTrackArray.count;
-        NSLog(@"count:%lu", (unsigned long)count);
-        NSLog(@"%@", motionTrackArray);
         BMKMapPoint *tempPoints = new BMKMapPoint[count];
         int number = 0;
         for (NSString *temp; number < count; number++) {
@@ -501,9 +499,7 @@
                     [self.colorIndex addObject:[NSNumber numberWithInt:1]];
                 }
             }
-            NSLog(@"number:%d", number);
         }
-        NSLog(@"array:%@", self.locationArray);
         [self.polyLine setPolylineWithPoints:tempPoints count:count textureIndex:self.colorIndex];
         [self.mapView addOverlay:self.polyLine];
         delete []tempPoints;
@@ -702,7 +698,6 @@
  **/
 - (void)drawPolyLine {
     NSUInteger count = self.locationArray.count;
-    NSLog(@"polyline.locationarray%lu", (unsigned long)count);
     BMKMapPoint *tempPoints = new BMKMapPoint[count];
     [self.locationArray enumerateObjectsUsingBlock:^(CLLocation *location, NSUInteger idx, BOOL *stop){
         BMKMapPoint locationPoint = BMKMapPointForCoordinate(location.coordinate);
@@ -865,7 +860,6 @@
 // 暂停运动 显示暂停菜单
 - (void)stopSport {
     if (!isPause) {
-        NSLog(@"暂停运动");
 //        [self showStopMenu];
         [countTimeTimer setFireDate:[NSDate distantFuture]];
         [switchButton setImage:[UIImage imageNamed:@"开始图标"] forState:UIControlStateNormal];
@@ -885,7 +879,6 @@
 
 // 继续运动 隐藏暂停菜单
 - (void)continueSport {
-    NSLog(@"继续运动");
 //    [self hiddenStopMenu];
     [switchButton setImage:[UIImage imageNamed:@"暂停图标"] forState:UIControlStateNormal];
     [self.bmkLocationService startUserLocationService];
@@ -950,7 +943,7 @@
                                   [NSNumber numberWithInt:duration], @"duration",
                                   [NSNumber numberWithLong:endTimestamp], @"endTimestamp",
                                   nil];
-            NSLog(@"userid%@, sporttype%@, distance%@, duration%@, endtimestamp%@", userId, sportType, [NSNumber numberWithFloat:TrackDistance/1000], [NSNumber numberWithInt:duration], [NSNumber numberWithLong:endTimestamp]);
+//            NSLog(@"userid%@, sporttype%@, distance%@, duration%@, endtimestamp%@", userId, sportType, [NSNumber numberWithFloat:TrackDistance/1000], [NSNumber numberWithInt:duration], [NSNumber numberWithLong:endTimestamp]);
             
             /** 请求服务器接口 */
             [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
@@ -992,7 +985,6 @@
  *  开始一次新的运动 运动类型不变
  **/
 - (void)continueAnotherSport {
-    NSLog(@"再运动一次");
     isBegin             = NO;
     isPause             = NO;
     isContinue          = YES;
@@ -1070,7 +1062,6 @@
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
     NSInteger interval = [zone secondsFromGMTForDate:[NSDate date]];
     startTime = [[NSDate date]  dateByAddingTimeInterval: interval];
-    NSLog(@"starttime%@", startTime);
     /** 运动类型 */
     int sportType;
     if ([sportMode isEqualToString:@"走"]) {
@@ -1159,7 +1150,6 @@
     
     /** 真实的运动时间 */
     duration = cha-pauseTime;
-    NSLog(@"真是运动时间：%d", duration);
     
     int sen = [[NSString stringWithFormat:@"%d", (int)cha%60] intValue];
     
