@@ -109,22 +109,26 @@
                 loginButton.enabled = YES;
                 // 记录已登陆
                 [userDefaults setBool:YES forKey:@"isLogin"];
-                NSLog(@"登陆后记录是否登陆：%d", [userDefaults boolForKey:@"isLogin"]);
                 // 将用户id记录到缓存
                 NSString *currentIntegral = object[@"integral"];
                 NSString *userId = object[@"userId"];
                 if (![[userDefaults objectForKey:@"userId"] isEqualToString:userId]) {
                     [userDefaults setObject:userId forKey:@"userId"];
                     [userDefaults setObject:currentIntegral forKey:@"currentIntegral"];
-                    [userDefaults setBool:NO forKey:@"isSport"];
+//                    [userDefaults setBool:NO forKey:@"isSport"];
                 }
                 [userDefaults setObject:currentIntegral forKey:@"currentIntegral"];
                 SMMainViewController *mainViewController = [[SMMainViewController alloc] init];
                 [self.navigationController pushViewController:mainViewController animated:YES];
-            }else {
+            }else if ([resultCode intValue] != 200){
                 NSString *errorMessage = object[@"errorMessage"];
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:errorMessage delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
-                [alertView show];
+                if ([errorMessage isEqualToString:@"notfound"]) {
+                    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"用户id错误" delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+                    [alertView show];
+                }else {
+                    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"请连接网络" delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+                    [alertView show];
+                }
             }
         }];
     }else {
@@ -148,7 +152,6 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    NSLog(@"login:%d", [userDefaults boolForKey:@"isLogin"]);
     if ([userDefaults boolForKey:@"isLogin"]) {
         SMMainViewController *mainViewController = [[SMMainViewController alloc] init];
         [self.navigationController pushViewController:mainViewController animated:YES];

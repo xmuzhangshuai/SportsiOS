@@ -18,6 +18,9 @@
 #import <FMDB/FMDB.h>
 #import "HJFActivityIndicatorView.h"
 
+#import "SaveDataToServer.h"
+#import "SaveDataToLocalDB.h"
+
 #define SPORTTIME_CENTER_Y      0.23*SCREEN_HEIGHT
 #define SPORTDISTANCE_CENTER_Y  0.4*SCREEN_HEIGHT
 
@@ -87,11 +90,12 @@
         totalTime       = 0;
         totalDistance   = 0;
         
+        
         // 判断是否正在运动
         myAppDelegate   = [[UIApplication sharedApplication] delegate];
         
         userDefaults    = [NSUserDefaults standardUserDefaults];
-        if ([userDefaults boolForKey:@"isSport"] == YES) {
+        if ([userDefaults boolForKey:@"isSport"]) {
             [userDefaults setBool:[self IsSport] forKey:@"isSport"];
         }
     }
@@ -291,7 +295,7 @@
 
 - (void)toLoginView {
     if ([userDefaults boolForKey:@"isSport"]) {
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"您正在运动中，是否退出" delegate:self cancelButtonTitle:@"是" otherButtonTitles:@"否", nil];
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"您正在运动中，是否结束运动" delegate:self cancelButtonTitle:@"是" otherButtonTitles:@"否", nil];
         alertView.tag = 3;
         [alertView show];
     }else {
@@ -317,7 +321,7 @@
 - (BOOL)IsSport {
     FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
     [db open];
-    FMResultSet *resultSet = [db executeQuery:@"select * from sportrecordtemp"];
+    FMResultSet *resultSet = [db executeQuery:[NSString stringWithFormat:@"select * from sportrecordtemp where userid = '%@'", [userDefaults objectForKey:@"userId"]]];
     while ([resultSet next]) {
         NSArray *startTimeStr = [[resultSet stringForColumn:@"starttime"] componentsSeparatedByString:@" "];
         if ([self isToday:startTimeStr[0]]) {
@@ -347,22 +351,46 @@
  *  同步服务器数据库
  **/
 - (void)downloadServerDataBase {
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    [df setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    BOOL isEmpty = YES;
+    FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
+    if ([db open]) {
+        FMResultSet *result = [db executeQuery:@"select * from integralgained"];
+        while ([result next]) {
+            isEmpty = NO;
+        }
+    }
+    if (isEmpty) {
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:0];
+        NSString *dateStr = [df stringFromDate:date];
+        NSDate *newDate = [df dateFromString:dateStr];
+        [userDefaults setObject:newDate forKey:@"lastSyncTimestamp"];
+    }
     AVQuery *integralQuery = [AVQuery queryWithClassName:@"IntegralGained"];
     [integralQuery whereKey:@"useId" hasPrefix:[userDefaults objectForKey:@"userId"]];
+    [integralQuery whereKey:@"updatedAt" greaterThan:[userDefaults objectForKey:@"lastSyncTimestamp"]];
     [integralQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         // 同步积分表
         /** 先删除原先的数据 */
-        FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
+        
         if ([db open]) {
-            [db executeUpdate:@"delete from integralgained"];
+//            [db executeUpdate:@"delete from integralgained"];
             for (AVObject *temp in objects) {
                 NSString *uid = temp[@"uid"];
                 NSString *userid = temp[@"useId"];
                 NSDate *gaintime = temp[@"gainTime"];
-                NSString *gaintime1 = temp[@"gainTime"];
+                
+                NSTimeZone *zone = [NSTimeZone systemTimeZone];
+                
+                NSInteger interval = [zone secondsFromGMTForDate:gaintime];
+                
+                NSDate *gaintime1 = [gaintime  dateByAddingTimeInterval:interval];
+                
+                
                 int integral = [temp[@"integral"] intValue];
                 int gainreason = [temp[@"gainReason"] intValue];
-                [db executeUpdate:[NSString stringWithFormat:@"insert into integralgained (uid, useid, gaintime, integral, gainreason) values ('%@', '%@', '%@', %d, %d)", uid, userid, gaintime, integral, gainreason]];
+                [db executeUpdate:[NSString stringWithFormat:@"insert into integralgained (uid, useid, gaintime, integral, gainreason) values ('%@', '%@', '%@', %d, %d)", uid, userid, gaintime1, integral, gainreason]];
             }
             [activityIndicatorView removeFromSuperview];
             if (!isShow) {
@@ -373,40 +401,45 @@
         [db close];
     }];
     
-    FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
     AVQuery *sportQuery = [AVQuery queryWithClassName:@"SportRecord"];
     [sportQuery whereKey:@"userID" containsString:[userDefaults objectForKey:@"userId"]];
+    [sportQuery whereKey:@"updatedAt" greaterThan:[userDefaults objectForKey:@"lastSyncTimestamp"]];
     [sportQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         // 同步运动记录表
         /** 先删除原先的数据 */
         if ([db open]) {
-            if ([db executeUpdate:@"delete from sportrecord"]) {
-                for (AVObject *temp in objects) {
-                    NSString *uid = temp[@"uid"];
-                    NSString *userid = temp[@"userID"];
-                    int sporttype = [temp[@"sportType"] intValue];
-                    NSDate *starttime = temp[@"startTime"];
-                    NSDate *endtime = temp[@"endTime"];
-                    int pausetime = [temp[@"pauseTime"] intValue];
-                    NSString *motiontrack = temp[@"motionTrack"];
-                    CGFloat distance = [temp[@"distance"] floatValue];
-                    [db executeUpdate:[NSString stringWithFormat:@"insert into sportrecord (uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance) values ('%@', '%@', %d, '%@', '%@', %d, '%@', %f)", uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance]];
-//                    NSLog(@"服务器数据：%@\n\n\n", temp);
-                    totalTime += [self intervalFrom:starttime to:endtime];
-                    totalDistance += distance;
-                }
+            for (AVObject *temp in objects) {
+                NSString *uid = temp[@"uid"];
+                NSString *userid = temp[@"userID"];
+                int sporttype = [temp[@"sportType"] intValue];
+                NSDate *starttime = temp[@"startTime"];
+                NSDate *endtime = temp[@"endTime"];
+                int pausetime = [temp[@"pauseTime"] intValue];
+                NSString *motiontrack = temp[@"motionTrack"];
+                CGFloat distance = [temp[@"distance"] floatValue];
+                [db executeUpdate:[NSString stringWithFormat:@"insert into sportrecord (uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance) values ('%@', '%@', %d, '%@', '%@', %d, '%@', %f)", uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance]];
+                totalTime += [self intervalFrom:starttime to:endtime];
+                totalDistance += distance;
             }
             [activityIndicatorView removeFromSuperview];
             if (!isShow) {
                 [self UILayout];
                 isShow = YES;
             }
-            detailsTime.text = [self intervalToTime:totalTime];
-            detailsDistance.text = [NSString stringWithFormat:@"%.1f公里", totalDistance/1000];
-            myAppDelegate.totalTrackDistance = totalDistance/1000;
+            NSUInteger preTotalTime = [[userDefaults objectForKey:@"totalTime"] integerValue];
+            CGFloat preTotalDistance = [[userDefaults objectForKey:@"totalDistance"] floatValue];
+            detailsTime.text = [self intervalToTime:totalTime+preTotalTime];
+            detailsDistance.text = [NSString stringWithFormat:@"%.1f公里", (totalDistance+preTotalDistance)/1000];
+            [userDefaults setObject:[NSNumber numberWithInteger:totalTime+preTotalTime] forKey:@"totalTime"];
+            [userDefaults setObject:[NSNumber numberWithFloat:totalDistance+preTotalDistance] forKey:@"totalDistance"];
+            myAppDelegate.totalTrackDistance = (totalDistance+preTotalDistance)/1000;
         }
         [db close];
     }];
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:time(NULL)];
+    NSString *dateStr = [df stringFromDate:date];
+    NSDate *newDate = [df dateFromString:dateStr];
+    [userDefaults setObject:newDate forKey:@"lastSyncTimestamp"];
 }
 
 /**
@@ -435,11 +468,34 @@
     return timeString;
 }
 
+
+
 #pragma mark - uialertviewdelegate
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (alertView.tag == 3) {
-        [userDefaults setBool:NO forKey:@"isLogin"];
         if (buttonIndex == 0) {
+            // 上传当前的运动记录
+            if ([SaveDataToServer saveDateToSportScore]) {
+                [userDefaults setBool:NO forKey:@"isSport"];
+                [userDefaults setBool:NO forKey:@"isSportStop"];
+                
+                /** 请求服务器接口 */
+                NSDictionary *dict = [userDefaults objectForKey:@"MainToUpload"];
+                [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
+                    NSNumber *resultCode = object[@"resultCode"];
+                    if ([resultCode intValue] == 200) {
+                        [userDefaults setBool:NO forKey:@"isUploadRecord"];
+                    }else {
+                        NSString *errorMessage = object[@"errorMessage"];
+                        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:errorMessage delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+                        alertView.tag = 1;
+                        [alertView show];
+                    }
+                }];
+            }else {
+                NSLog(@"数据上传失败");
+            }
+            [userDefaults setBool:NO forKey:@"isLogin"];
             [userDefaults setObject:@"" forKey:@"userId"];
             [self.navigationController popViewControllerAnimated:YES];
         }

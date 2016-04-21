@@ -32,6 +32,9 @@
 @property (nonatomic, strong) BMKMapManager *mapManager;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
 
+/** 后台定位 */
+@property (nonatomic, unsafe_unretained) UIBackgroundTaskIdentifier bgTask;
+
 @end
 
 @implementation AppDelegate
@@ -45,10 +48,14 @@
         [self.userDefaults setBool:NO forKey:@"isUploadRecord"];
         [self.userDefaults setObject:@"00:00:00" forKey:@"usedTime"];
         [self.userDefaults setBool:YES forKey:@"everLaunched"];
+        [self.userDefaults setBool:NO forKey:@"isSportStop"];
+        [self.userDefaults setObject:[NSNumber numberWithInteger:0] forKey:@"totalTime"];
+        [self.userDefaults setObject:[NSNumber numberWithFloat:0] forKey:@"totalDistance"];
     }
     
     // 数据库创建
     self.dataBasePath = [self DataBasePath];
+    NSLog(@"%@", self.dataBasePath);
     [self dataBaseCreate:self.dataBasePath];
     
     
@@ -93,6 +100,12 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    BOOL backgroundAccepted = [[UIApplication sharedApplication] setKeepAliveTimeout:600 handler:^{ [self backgroundHandler]; }];
+    if (backgroundAccepted)
+    {
+        NSLog(@"backgrounding accepted");
+    }
+    [self backgroundHandler];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -160,6 +173,29 @@
     BOOL result2 = [dataBase executeUpdate:
                     @"create table if not exists SportRecordTemp (uid text PRIMARY KEY, userid text NOT NULL, sporttype int not null, starttime date not null, endtime date not null, pausetime int, motiontrack text not null, distance float);"];
     return result && result1 && result2;
+}
+
+#pragma mark - 百度地图后台调用方法
+- (void)backgroundHandler
+{
+    NSLog(@"### -->backgroundinghandler");
+    UIApplication* app = [UIApplication sharedApplication];
+    self.bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
+        [app endBackgroundTask:self.bgTask];
+        self.bgTask = UIBackgroundTaskInvalid;
+    }];
+    // Start the long-running task
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // 您想做的事情,
+        // 比如我这里是发送广播, 重新激活定位
+        // 取得ios系统唯一的全局的广播站 通知中心
+        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+        //设置广播内容
+        NSDictionary *dict = [[NSDictionary alloc]init];
+        //将内容封装到广播中 给ios系统发送广播
+        // LocationTheme频道
+        [nc postNotificationName:@"LocationTheme" object:self userInfo:dict];
+    });
 }
 
 @end
