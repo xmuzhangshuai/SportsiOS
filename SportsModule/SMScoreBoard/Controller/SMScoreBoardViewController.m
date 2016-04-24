@@ -413,8 +413,11 @@
                 [self UILayout];
                 isShow = YES;
             }
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:object[@"errorMessage"] delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
-            [alertView show];
+            if ([object[@"errorMessage"] isEqualToString:@"notfound"]) {
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"没有相关排名" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+                [alertView show];
+            }
+            
         }
     }];
 }

@@ -43,9 +43,7 @@
         NSString *userId = [resultSet stringForColumn:@"userid"];
         int sportMode = [resultSet intForColumn:@"sporttype"];
         NSString *startTimeStr = [resultSet stringForColumn:@"starttime"];
-        NSLog(@"starttimestr:%@", startTimeStr);
         NSDate *startTime = [df dateFromString:startTimeStr];
-        NSLog(@"starttime:%@", startTime);
         AVQuery *query = [AVQuery queryWithClassName:@"SportRecordTmp"];
         [query whereKey:@"uid" equalTo:myAppDelegate.currentUUID];
         [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {

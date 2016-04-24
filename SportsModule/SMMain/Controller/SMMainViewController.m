@@ -375,22 +375,33 @@
         /** 先删除原先的数据 */
         
         if ([db open]) {
-//            [db executeUpdate:@"delete from integralgained"];
+            
             for (AVObject *temp in objects) {
                 NSString *uid = temp[@"uid"];
-                NSString *userid = temp[@"useId"];
-                NSDate *gaintime = temp[@"gainTime"];
-                
-                NSTimeZone *zone = [NSTimeZone systemTimeZone];
-                
-                NSInteger interval = [zone secondsFromGMTForDate:gaintime];
-                
-                NSDate *gaintime1 = [gaintime  dateByAddingTimeInterval:interval];
-                
-                
-                int integral = [temp[@"integral"] intValue];
-                int gainreason = [temp[@"gainReason"] intValue];
-                [db executeUpdate:[NSString stringWithFormat:@"insert into integralgained (uid, useid, gaintime, integral, gainreason) values ('%@', '%@', '%@', %d, %d)", uid, userid, gaintime1, integral, gainreason]];
+                NSLog(@"%@", uid);
+                FMResultSet *resultset = [db executeQuery:@"select * from integralgained"];
+                [db open];
+                // 如果uid已经存在 则不需要再插入
+                BOOL isExits = NO;
+                while ([resultset next]) {
+                    if ([[resultset stringForColumn:@"uid"] isEqualToString:uid]) {
+                        isExits = YES;
+                    }
+                }
+                if (!isExits) {
+                    NSString *userid = temp[@"useId"];
+                    NSDate *gaintime = temp[@"gainTime"];
+                    
+                    NSTimeZone *zone = [NSTimeZone systemTimeZone];
+                    NSInteger interval = [zone secondsFromGMTForDate:gaintime];
+                    NSDate *gaintime1 = [gaintime  dateByAddingTimeInterval:interval];
+                    
+                    
+                    int integral = [temp[@"integral"] intValue];
+                    int gainreason = [temp[@"gainReason"] intValue];
+                    [db executeUpdate:[NSString stringWithFormat:@"insert into integralgained (uid, useid, gaintime, integral, gainreason) values ('%@', '%@', '%@', %d, %d)", uid, userid, gaintime1, integral, gainreason]];
+                }
+                [db close];
             }
             [activityIndicatorView removeFromSuperview];
             if (!isShow) {
@@ -410,29 +421,42 @@
         if ([db open]) {
             for (AVObject *temp in objects) {
                 NSString *uid = temp[@"uid"];
-                NSString *userid = temp[@"userID"];
-                int sporttype = [temp[@"sportType"] intValue];
-                NSDate *starttime = temp[@"startTime"];
-                NSDate *endtime = temp[@"endTime"];
-                int pausetime = [temp[@"pauseTime"] intValue];
-                NSString *motiontrack = temp[@"motionTrack"];
-                CGFloat distance = [temp[@"distance"] floatValue];
-                [db executeUpdate:[NSString stringWithFormat:@"insert into sportrecord (uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance) values ('%@', '%@', %d, '%@', '%@', %d, '%@', %f)", uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance]];
-                totalTime += [self intervalFrom:starttime to:endtime];
-                totalDistance += distance;
+                NSLog(@"%@", uid);
+                FMResultSet *resultset = [db executeQuery:@"select * from sportrecord"];
+                // 如果uid已经存在 则不需要再插入
+                BOOL isExits = NO;
+                while ([resultset next]) {
+                    if ([[resultset stringForColumn:@"uid"] isEqualToString:uid]) {
+                        isExits = YES;
+                    }
+                }
+                if (!isExits) {
+                    NSString *userid = temp[@"userID"];
+                    int sporttype = [temp[@"sportType"] intValue];
+                    NSDate *starttime = temp[@"startTime"];
+                    NSDate *endtime = temp[@"endTime"];
+                    int pausetime = [temp[@"pauseTime"] intValue];
+                    NSString *motiontrack = temp[@"motionTrack"];
+                    CGFloat distance = [temp[@"distance"] floatValue];
+                    [db executeUpdate:[NSString stringWithFormat:@"insert into sportrecord (uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance) values ('%@', '%@', %d, '%@', '%@', %d, '%@', %f)", uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance]];
+//                    totalTime += [self intervalFrom:starttime to:endtime];
+//                    totalDistance += distance;
+                }
             }
             [activityIndicatorView removeFromSuperview];
             if (!isShow) {
                 [self UILayout];
                 isShow = YES;
             }
-            NSUInteger preTotalTime = [[userDefaults objectForKey:@"totalTime"] integerValue];
-            CGFloat preTotalDistance = [[userDefaults objectForKey:@"totalDistance"] floatValue];
-            detailsTime.text = [self intervalToTime:totalTime+preTotalTime];
-            detailsDistance.text = [NSString stringWithFormat:@"%.1f公里", (totalDistance+preTotalDistance)/1000];
-            [userDefaults setObject:[NSNumber numberWithInteger:totalTime+preTotalTime] forKey:@"totalTime"];
-            [userDefaults setObject:[NSNumber numberWithFloat:totalDistance+preTotalDistance] forKey:@"totalDistance"];
-            myAppDelegate.totalTrackDistance = (totalDistance+preTotalDistance)/1000;
+            [self updateData];
+//            NSUInteger preTotalTime = [[userDefaults objectForKey:@"totalTime"] integerValue];
+//            CGFloat preTotalDistance = [[userDefaults objectForKey:@"totalDistance"] floatValue];
+//            detailsTime.text = [self intervalToTime:totalTime+preTotalTime];
+//            detailsDistance.text = [NSString stringWithFormat:@"%.1f公里", (totalDistance+preTotalDistance)/1000];
+//            [userDefaults setObject:[NSNumber numberWithInteger:totalTime+preTotalTime] forKey:@"totalTime"];
+//            [userDefaults setObject:[NSNumber numberWithFloat:totalDistance+preTotalDistance] forKey:@"totalDistance"];
+//            myAppDelegate.totalTrackDistance = (totalDistance+preTotalDistance)/1000;
+            [db close];
         }
         [db close];
     }];
@@ -468,7 +492,31 @@
     return timeString;
 }
 
-
+/**
+ *
+ **/
+- (void)updateData {
+    totalTime = 0;
+    totalDistance = 0;
+    FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
+    if ([db open]) {
+        FMResultSet *resultset = [db executeQuery:@"select * from sportrecord"];
+        while ([resultset next]) {
+            NSString *starttimeStr = [resultset stringForColumn:@"starttime"];
+            NSString *endtimeStr = [resultset stringForColumn:@"endtime"];
+            NSDateFormatter *df = [[NSDateFormatter alloc] init];
+            [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
+            NSDate *starttime = [df dateFromString:starttimeStr];
+            NSDate *endtime = [df dateFromString:endtimeStr];
+            CGFloat distance = [resultset doubleForColumn:@"distance"];
+            totalTime += [self intervalFrom:starttime to:endtime];
+            totalDistance += distance;
+        }
+        detailsTime.text = [self intervalToTime:totalTime];
+        detailsDistance.text = [NSString stringWithFormat:@"%.1f公里", totalDistance/1000];
+    }
+    [db close];
+}
 
 #pragma mark - uialertviewdelegate
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
@@ -524,6 +572,7 @@
     self.extendedLayoutIncludesOpaqueBars = YES;
 }
 
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [UINavigationBar appearance].translucent = NO;
@@ -536,6 +585,7 @@
         [KButton removeTarget:self action:@selector(toSportChoice) forControlEvents:UIControlEventTouchUpInside];
         [KButton addTarget:self action:@selector(toMapView) forControlEvents:UIControlEventTouchUpInside];
     }
+    [self updateData];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

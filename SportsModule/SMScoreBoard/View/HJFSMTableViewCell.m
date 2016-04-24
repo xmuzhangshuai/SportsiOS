@@ -67,6 +67,7 @@
     _userImageView = [[UIImageView alloc] init];
     _userImageView.clipsToBounds = YES;      // 将imageview设置成圆形
     _userImageView.layer.cornerRadius = USERIMAGEVIEW_WIDTH/2;
+    _userImageView.backgroundColor = [UIColor grayColor];
     [self.contentView addSubview:_userImageView];
     
     userNameLabel = [[UILabel alloc] init];
@@ -87,7 +88,7 @@
     
     _userImageView.frame = CGRectMake(USERIMAGEVIEW_X, USERIMAGEVIEW_Y, USERIMAGEVIEW_WIDTH, USERIMAGEVIEW_WIDTH);
     [_userImageView sd_setImageWithURL:[NSURL URLWithString:score.userPicUrl]];
-//    _userImageView.backgroundColor = [UIColor grayColor];
+
     
     userNameLabel.frame = CGRectMake(0, 0, USERNAMELABEL_WIDTH, USERNAMELABEL_HEIGHT);
     userNameLabel.center = CGPointMake(CENTER_X, USERNAMELABEL_CENTER_Y);

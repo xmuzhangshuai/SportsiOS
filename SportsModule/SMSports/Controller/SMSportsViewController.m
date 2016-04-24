@@ -502,7 +502,7 @@
             CLLocation *Point = [[CLLocation alloc] initWithLatitude:point.latitude longitude:point.longitude];
             [self.locationArray addObject:Point];
             tempPoints[number] = locationPoint;
-            if ([motionArray[0] rangeOfString:@"stop"].location != NSNotFound && number > 0) {
+            if ([motionArray[0] hasPrefix:@"stop"] && number > 0) {
                 isSpot = YES;
                 [self.colorIndex addObject:[NSNumber numberWithInt:1]];
             }else if (number > 0){
@@ -521,7 +521,6 @@
         [self.mapView addOverlay:self.polyLine];
         delete []tempPoints;
         [self.colorIndex addObject:[NSNumber numberWithInt:0]];
-//        [self.bmkLocationService startUserLocationService];
     }else {
         // 开始一次新的运动
         /** 开始时间 */
@@ -530,7 +529,6 @@
         [dateFormatter setDateFormat:@"HH:mm:ss"];
         startTimeLabel.text = [NSString stringWithFormat:@"%@", [dateFormatter stringFromDate:startTime]];
         // 开启
-//        [self.bmkLocationService startUserLocationService];
 //        NSLog(@"开启定位");
         // 开始运动 将当前运动记录写入
         
@@ -615,9 +613,11 @@
         [self.mapView addAnnotation:self.startPoint];
     }
     if (isContinue) {
-        NSString *temp = [MARK stringByAppendingString:[NSString stringWithFormat:@"Lon%fLat%f;", userLocation.location.coordinate.longitude, userLocation.location.coordinate.latitude]];
-        NSString *temp1 = [motionTrack stringByAppendingString:temp];
-        motionTrack = temp1;
+        if (![self.userDefaults boolForKey:@"isSportStop"]) {
+            NSString *temp = [MARK stringByAppendingString:[NSString stringWithFormat:@"Lon%fLat%f;", userLocation.location.coordinate.longitude, userLocation.location.coordinate.latitude]];
+            NSString *temp1 = [motionTrack stringByAppendingString:temp];
+            motionTrack = temp1;
+        }
         isContinue = NO;
         if ([self.userDefaults boolForKey:@"isSportStop"]) {
             isPause = NO;
@@ -635,13 +635,14 @@
                 [self.userDefaults setBool:YES forKey:@"isSport"];
             }
         }
-        [self TrailRouteWithUserLocation:userLocation];
+        if (![self.userDefaults boolForKey:@"isSportStop"]) {
+            [self TrailRouteWithUserLocation:userLocation];
+        }
     }else {
         NSString *temp = [motionTrack stringByAppendingString:[NSString stringWithFormat:@"Lon%fLat%f;", userLocation.location.coordinate.longitude, userLocation.location.coordinate.latitude]];
         motionTrack = temp;
         [self TrailRouteWithUserLocation:userLocation];
     }
-    
 }
 
 /**
@@ -740,8 +741,11 @@
             [self.colorIndex addObject:[NSNumber numberWithInt:1]];
         }
     }
+//    if ([self.userDefaults boolForKey:@"isSportStop"]) {
+//        [self.locationArray removeObjectAtIndex:self.locationArray.count-1];
+//        self.colorIndex removeObjectAtIndex:self.colorIndex.count - 2
+//    }
     [self.polyLine setPolylineWithPoints:tempPoints count:count textureIndex:self.colorIndex];
-    
     if (self.polyLine) {
         [self.mapView addOverlay:self.polyLine];
     }
@@ -831,6 +835,8 @@
         }
     }else if (alertView.tag == 2){
         [self.navigationController popViewControllerAnimated:YES];
+    }else if (alertView.tag == 3){
+        // 不做处理
     }
 }
 
@@ -957,27 +963,31 @@
         // 关闭定位
         [self.bmkLocationService stopUserLocationService];
         isPause = YES;
-        [self.userDefaults setBool:YES forKey:@"isSportStop"];
+        
         // 记录暂停时间点
         stopTime = [NSDate date];
-        // 暂停后的那个点 先删除数组里面的最后一个点
         
-        NSArray *array = [motionTrack componentsSeparatedByString:@";"];
-        NSMutableArray *array1 = [[NSMutableArray alloc] initWithArray:array];
-        [array1 removeLastObject];
-        [array1 removeLastObject];
-        if ([motionTrack rangeOfString:@"stop"].location != NSNotFound) {
+        if (![self.userDefaults boolForKey:@"isSportStop"]) {
+            // 暂停后的那个点 先删除数组里面的最后一个点
+            NSArray *array = [motionTrack componentsSeparatedByString:@";"];
+            NSMutableArray *array1 = [[NSMutableArray alloc] initWithArray:array];
+            // 去掉最后一个点和空格
             [array1 removeLastObject];
+            [array1 removeLastObject];
+            //        if ([motionTrack rangeOfString:@"stop"].location != NSNotFound) {
+            //            [array1 removeLastObject];
+            //        }
+            motionTrack = @"";
+            [array1 enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                // 将所有点拼接起来
+                motionTrack = [motionTrack stringByAppendingString:obj];
+                motionTrack = [motionTrack stringByAppendingString:@";"];
+            }];
+            NSString *temp = [STOPMARK stringByAppendingString:[NSString stringWithFormat:@"Lon%fLat%f;", self.preLocation.coordinate.longitude, self.preLocation.coordinate.latitude]];
+            NSString *temp1 = [motionTrack stringByAppendingString:temp];
+            motionTrack = temp1;
         }
-        motionTrack = @"";
-        [array1 enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            // 将所有点拼接起来
-            motionTrack = [motionTrack stringByAppendingString:obj];
-            motionTrack = [motionTrack stringByAppendingString:@";"];
-        }];
-        NSString *temp = [STOPMARK stringByAppendingString:[NSString stringWithFormat:@"Lon%fLat%f;", self.preLocation.coordinate.longitude, self.preLocation.coordinate.latitude]];
-        NSString *temp1 = [motionTrack stringByAppendingString:temp];
-        motionTrack = temp1;
+        [self.userDefaults setBool:YES forKey:@"isSportStop"];
     }else {
         [self continueSport];
     }
@@ -1000,85 +1010,92 @@
 - (void)doneSport {
     if (TrackDistance/1000 != 0) {
         /** 将运动记录保存到本地数据库临时表 */
-        [self saveRecordToTempFinally];
-        /** 将运动记录保存到服务器 */
-        HJFActivityIndicatorView *waitView = [[HJFActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 0.3*SCREEN_WIDTH, 0.8*0.3*SCREEN_WIDTH) andViewAlpha:0.8 andCornerRadius:8];
-        waitView.center = self.view.center;
-        [self.view addSubview:waitView];
-        if ([SaveDataToServer saveDateToSportScore]) {
-            [self.userDefaults setBool:NO forKey:@"isSport"];
-            [self.userDefaults setBool:NO forKey:@"isSportStop"];
-            // 显示整条运动轨迹 设置地图显示范围
-            [self.bmkLocationService stopUserLocationService];
-            [self mapViewFitPolyLine:self.polyLine];
-            /** 关闭计时器 */
-            [countTimeTimer invalidate];
-            countTimeTimer = nil;
-            [saveDataPer3MinTimer invalidate];
-            saveDataPer3MinTimer = nil;
-            
-            
-            /** 将暂停界面去掉后截图 */
-            if (isStopMenu) {
-                [self hiddenStopMenu];
-            }
-            UIImage *screenView = [self screenView];
-            /** 沙盒目录 */
-            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
-            NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:[NSString stringWithFormat:@"screenView.png"]];   // 保存文件的名称
-            [UIImagePNGRepresentation(screenView)writeToFile:filePath atomically:YES]; // 保存成功会返回YES
-            
-            
-            // 计算出多少积分并且提醒用户 还要往本地数据库积分表写入数据
-            NSNumber *sportType;
-            if ([sportMode isEqualToString:@"走"]) {
-                sportType = [NSNumber numberWithInt:1];
-            }else if ([sportMode isEqualToString:@"跑"]){
-                sportType = [NSNumber numberWithInt:2];
-            }else if ([sportMode isEqualToString:@"骑"]){
-                sportType = [NSNumber numberWithInt:3];
-            }
-            NSTimeInterval endTimestamp = time(NULL);
-            NSString *userId = [self.userDefaults objectForKey:@"userId"];
-//            [self intervalSinceNow:startTime];
-            duration = [self timeToInterval:usedTimeLabel.text];
-            NSString *distanceNumber = [NSString stringWithFormat:@"%.2f", TrackDistance/1000];
-            CGFloat distance = [distanceNumber floatValue];
-            NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  userId, @"userId",
-                                  sportType, @"sportType",
-                                  [NSNumber numberWithFloat:distance], @"distance",
-                                  [NSNumber numberWithInt:duration], @"duration",
-                                  [NSNumber numberWithLong:endTimestamp], @"endTimestamp",
-                                  nil];
-//            NSLog(@"userid%@, sporttype%@, distance%@, duration%@, endtimestamp%@", userId, sportType, [NSNumber numberWithFloat:TrackDistance/1000], [NSNumber numberWithInt:duration], [NSNumber numberWithLong:endTimestamp]);
-            
-            /** 请求服务器接口 */
-            [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
-                NSNumber *resultCode = object[@"resultCode"];
-                if ([resultCode intValue] == 200) {
-                    [self.userDefaults setBool:NO forKey:@"isUploadRecord"];
-                    [waitView removeFromSuperview];
-                    NSNumber *integral = object[@"integralGained"];
-                    int integralNumber = [integral intValue];
-                    [self showStopMenu];
-                    beenFinishLabel.text = [NSString stringWithFormat:@"%.2f", TrackDistance/1000];
-                    successFinishLabel.text = [NSString stringWithFormat:@"%@", integral];
-                    /** 将获得积分结果写入本地数据库 */
-                    [SaveDataToLocalDB saveDataToIntegralGained:self.myAppDelegate.currentUUID UserId:userId GainTime:endTime Integral:integralNumber GainReason:1];
-                    stopCount = 0;
-                }else {
-                    [waitView removeFromSuperview];
-                    NSString *errorMessage = object[@"errorMessage"];
-                    if ([errorMessage isEqualToString:@"error params"]) {
-                        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"获取积分失败" delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
-                        alertView.tag = 1;
-                        [alertView show];
-                    }
+        if ([self saveRecordToTempFinally]) {
+            /** 将运动记录保存到服务器 */
+            HJFActivityIndicatorView *waitView = [[HJFActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 0.3*SCREEN_WIDTH, 0.8*0.3*SCREEN_WIDTH) andViewAlpha:0.8 andCornerRadius:8];
+            waitView.center = self.view.center;
+            [self.view addSubview:waitView];
+            if ([SaveDataToServer saveDateToSportScore]) {
+                [self.userDefaults setBool:NO forKey:@"isSport"];
+                [self.userDefaults setBool:NO forKey:@"isSportStop"];
+                // 显示整条运动轨迹 设置地图显示范围
+                [self.bmkLocationService stopUserLocationService];
+                [self mapViewFitPolyLine:self.polyLine];
+                /** 关闭计时器 */
+                [countTimeTimer invalidate];
+                countTimeTimer = nil;
+                [saveDataPer3MinTimer invalidate];
+                saveDataPer3MinTimer = nil;
+                
+                
+                /** 将暂停界面去掉后截图 */
+                if (isStopMenu) {
+                    [self hiddenStopMenu];
                 }
-            }];
+                
+                
+                
+                // 计算出多少积分并且提醒用户 还要往本地数据库积分表写入数据
+                NSNumber *sportType;
+                if ([sportMode isEqualToString:@"走"]) {
+                    sportType = [NSNumber numberWithInt:1];
+                }else if ([sportMode isEqualToString:@"跑"]){
+                    sportType = [NSNumber numberWithInt:2];
+                }else if ([sportMode isEqualToString:@"骑"]){
+                    sportType = [NSNumber numberWithInt:3];
+                }
+                NSTimeInterval endTimestamp = time(NULL);
+                NSString *userId = [self.userDefaults objectForKey:@"userId"];
+                //            [self intervalSinceNow:startTime];
+                duration = [self timeToInterval:usedTimeLabel.text];
+                NSString *distanceNumber = [NSString stringWithFormat:@"%.2f", TrackDistance/1000];
+                CGFloat distance = [distanceNumber floatValue];
+                NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      userId, @"userId",
+                                      sportType, @"sportType",
+                                      [NSNumber numberWithFloat:distance], @"distance",
+                                      [NSNumber numberWithInt:duration], @"duration",
+                                      [NSNumber numberWithLong:endTimestamp], @"endTimestamp",
+                                      nil];
+                //            NSLog(@"userid%@, sporttype%@, distance%@, duration%@, endtimestamp%@", userId, sportType, [NSNumber numberWithFloat:TrackDistance/1000], [NSNumber numberWithInt:duration], [NSNumber numberWithLong:endTimestamp]);
+                
+                /** 请求服务器接口 */
+                [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
+                    NSNumber *resultCode = object[@"resultCode"];
+                    if ([resultCode intValue] == 200) {
+                        [self.userDefaults setBool:NO forKey:@"isUploadRecord"];
+                        [waitView removeFromSuperview];
+                        NSNumber *integral = object[@"integralGained"];
+                        int integralNumber = [integral intValue];
+                        
+                        [self showStopMenu];
+                        beenFinishLabel.text = [NSString stringWithFormat:@"%.2f", TrackDistance/1000];
+                        successFinishLabel.text = [NSString stringWithFormat:@"%@", integral];
+                        /** 将获得积分结果写入本地数据库 */
+//                        [SaveDataToLocalDB saveDataToIntegralGained:self.myAppDelegate.currentUUID UserId:userId GainTime:endTime Integral:integralNumber GainReason:1];
+                        stopCount = 0;
+                        UIImage *screenView = [self screenView];
+                        /** 沙盒目录 */
+                        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+                        NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:[NSString stringWithFormat:@"screenView.png"]];   // 保存文件的名称
+                        [UIImagePNGRepresentation(screenView)writeToFile:filePath atomically:YES]; // 保存成功会返回YES
+                    }else {
+                        [waitView removeFromSuperview];
+                        NSString *errorMessage = object[@"errorMessage"];
+                        if ([errorMessage isEqualToString:@"error params"]) {
+                            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"获取积分失败" delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+                            alertView.tag = 1;
+                            [alertView show];
+                        }
+                    }
+                }];
+            }else {
+                [waitView removeFromSuperview];
+                // 提示保存失败
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"保存数据失败，请重试" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+                [alertView show];
+            }
         }else {
-            [waitView removeFromSuperview];
             // 提示保存失败
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"保存数据失败，请重试" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
             [alertView show];
@@ -1091,6 +1108,7 @@
         alertView.tag = 2;
         [alertView show];
     }
+    
 }
 
 /**
@@ -1176,7 +1194,7 @@
     NSInteger interval = [zone secondsFromGMTForDate:[NSDate date]];
     startTime = [[NSDate date]  dateByAddingTimeInterval: interval];
     /** 运动类型 */
-    int sportType;
+    int sportType = 0;
     if ([sportMode isEqualToString:@"走"]) {
         sportType = 1;
     }else if ([sportMode isEqualToString:@"跑"]) {
@@ -1184,8 +1202,19 @@
     }else if ([sportMode isEqualToString:@"骑"]) {
         sportType = 3;
     }
-    [SaveDataToLocalDB saveDataToSportScoreTempFirstWithUId:self.myAppDelegate.currentUUID UserId:userId SportType:sportType StartTime:startTime EndTime:nil PauseTime:0 MotionTrack:motionTrack Distance:0];
-    [SaveDataToServer saveDateToSportScoreTemp];
+    if (startTime != nil) {
+        [SaveDataToLocalDB saveDataToSportScoreTempFirstWithUId:self.myAppDelegate.currentUUID UserId:userId SportType:sportType StartTime:startTime EndTime:nil PauseTime:0 MotionTrack:motionTrack Distance:0];
+        [SaveDataToServer saveDateToSportScoreTemp];
+//        if (![SaveDataToServer saveDateToSportScoreTemp]) {
+//            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"初始化失败，请重试" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
+//            alertView.tag = 2;
+//            [alertView show];
+//        }
+    }else {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"初始化失败，请重试" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
+        alertView.tag = 2;
+        [alertView show];
+    }
 }
 
 /**
@@ -1201,13 +1230,12 @@
 /**
  *  结束运动，往本地数据库写入完整数据
  **/
-- (void)saveRecordToTempFinally {
+- (BOOL)saveRecordToTempFinally {
     /** 结束时间 */
     NSTimeZone *zone = [NSTimeZone systemTimeZone];
     NSInteger interval = [zone secondsFromGMTForDate:[NSDate date]];
     endTime = [[NSDate date]  dateByAddingTimeInterval: interval];
-    [SaveDataToLocalDB saveDataToSportScoreTempFinallyWithEndTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance];
-    int sportType;
+    int sportType = 0;
     if ([sportMode isEqualToString:@"走"]) {
         sportType = 1;
     }else if ([sportMode isEqualToString:@"跑"]) {
@@ -1215,7 +1243,23 @@
     }else if([sportMode isEqualToString:@"骑"]) {
         sportType = 3;
     }
-    [SaveDataToLocalDB saveDataToSportScore:self.myAppDelegate.currentUUID UserId:[self.userDefaults objectForKey:@"userId"] SportType:sportType StartTime:startTime endTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance];
+    
+    if (endTime != nil) {
+        if (![SaveDataToLocalDB saveDataToSportScoreTempFinallyWithEndTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance]) {
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"数据上传失败，请重试" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
+            alertView.tag = 3;
+            [alertView show];
+            return NO;
+        }else {
+            [SaveDataToLocalDB saveDataToSportScore:self.myAppDelegate.currentUUID UserId:[self.userDefaults objectForKey:@"userId"] SportType:sportType StartTime:startTime endTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance];
+        }
+    }else {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"数据上传失败，请重试" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
+        alertView.tag = 3;
+        [alertView show];
+        return NO;
+    }
+    return YES;
 }
 
 /** 运动时间计时 */
@@ -1234,7 +1278,22 @@
             hour %= 24;
         }
     }
-    NSString *finallyTime = [NSString stringWithFormat:@"%d:%d:%d", hour, minute, second];
+    NSString *finallyTime = @"";
+    if (hour < 10) {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"0%d:", hour]];
+    }else {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"%d:", hour]];
+    }
+    if (minute < 10) {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"0%d:", minute]];
+    }else {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"%d:", minute]];
+    }
+    if (second < 10) {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"0%d", second]];
+    }else {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"%d", second]];
+    }
     usedTimeLabel.text = finallyTime;
     // 语音合成
     if ((minute % 15 == 0 && minute > 15) || TrackDistance-currentDistance > 1000) {
@@ -1339,12 +1398,13 @@
  *  截取屏幕图片
  **/
 - (UIImage*)screenView{
-    CGRect rect = self.navigationController.view.frame;
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    [self.navigationController.view.layer renderInContext:context];
-    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+//    CGRect rect = self.navigationController.view.frame;
+//    UIGraphicsBeginImageContext(rect.size);
+//    CGContextRef context = UIGraphicsGetCurrentContext();
+//    [self.view.layer renderInContext:context];
+//    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+//    UIGraphicsEndImageContext();
+    UIImage *img = [self.mapView takeSnapshot];
     return img;
 }
 

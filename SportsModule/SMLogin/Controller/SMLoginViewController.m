@@ -61,9 +61,12 @@
     userIdTF.placeholder = @"请输入用户识别码";
     [userIdTF setValue:[UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0] forKeyPath:@"_placeholderLabel.textColor"];
     [SMLoginViewController setTextFieldLeftPadding:userIdTF forWidth:LEFTPADDING];
+    userIdTF.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+    userIdTF.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
     userIdTF.layer.borderWidth = 1;
     userIdTF.layer.borderColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0].CGColor;
     userIdTF.layer.cornerRadius = CORNER_REDIUS;
+    [userIdTF becomeFirstResponder];
     
     loginButton.frame = CGRectMake(0, 0, BLACKBUTTON_WIDTH, BLACKBUTTON_HEIGHT);
     loginButton.center = CGPointMake(LOGINBUTTON_CENTER_X, LOGINBUTTON_CENTER_Y);
@@ -96,6 +99,7 @@
  *  前往主界面
  */
 - (void)toMainView {
+    [userIdTF resignFirstResponder];
     loginButton.enabled = NO;
     HJFActivityIndicatorView *waitView = [[HJFActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 0.3*SCREEN_WIDTH, 0.8*0.3*SCREEN_WIDTH) andViewAlpha:0.8 andCornerRadius:8];
     waitView.center = self.view.center;
@@ -148,6 +152,7 @@
     self.view.backgroundColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0];
     [self UILayout];
     self.extendedLayoutIncludesOpaqueBars = YES;
+    self.automaticallyAdjustsScrollViewInsets = NO;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
