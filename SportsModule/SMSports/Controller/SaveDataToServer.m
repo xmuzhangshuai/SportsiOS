@@ -58,7 +58,6 @@
                 [newSport setObject:[NSNumber numberWithInt:pauseTime] forKey:@"pauseTime"];
                 [newSport setObject:motionTrack forKey:@"motionTrack"];
                 [newSport setObject:[NSNumber numberWithFloat:trackDistance] forKey:@"distance"];
-                NSLog(@"%f", trackDistance);
                 isUpload = [newSport save];
             }else {
                 AVObject *currentSport = [objects objectAtIndex:0];
@@ -108,12 +107,11 @@
         NSDate *startTime = [df dateFromString:startTimeStr];
         NSDate *endTime = [df dateFromString:endTimeStr];
         
-        NSLog(@"uid%@, userID%@, sporttype%@, starttime%@, endtime%@, pausetime%d, motiontrack%@, distance%f", uId, userId, [NSNumber numberWithInt:sportMode], startTime, endTime, pauseTime, motionTrack, trackDistance
-              );
+//        NSLog(@"uid%@, userID%@, sporttype%@, starttime%@, endtime%@, pausetime%d, motiontrack%@, distance%f", uId, userId, [NSNumber numberWithInt:sportMode], startTime, endTime, pauseTime, motionTrack, trackDistance
+//              );
         
         if (![userDefaults boolForKey:@"isUploadRecord"]) {
             AVObject *newSport = [AVObject objectWithClassName:@"SportRecord"];
-            NSLog(@"starttime:%@ endtime:%@", startTime, endTime);
             [newSport setObject:uId forKey:@"uid"];
             [newSport setObject:userId forKey:@"userID"];
             [newSport setObject:[NSNumber numberWithInt:sportMode] forKey:@"sportType"];
@@ -122,7 +120,6 @@
             [newSport setObject:[NSNumber numberWithInt:pauseTime] forKey:@"pauseTime"];
             [newSport setObject:motionTrack forKey:@"motionTrack"];
             [newSport setObject:[NSNumber numberWithFloat:trackDistance] forKey:@"distance"];
-            NSLog(@"%f", trackDistance);
             isUpload = [newSport save];
             if (isUpload) {
                 [userDefaults setBool:YES forKey:@"isUploadRecord"];

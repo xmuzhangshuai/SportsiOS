@@ -301,6 +301,13 @@
     }else {
         [userDefaults setObject:@"" forKey:@"userId"];
         [userDefaults setBool:NO forKey:@"isLogin"];
+        // 删除本地数据库表的数据
+        FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
+        if ([db open]) {
+            [db executeUpdate:@"delete from integralgained"];
+            [db executeUpdate:@"delete from sportrecord"];
+        }
+        [db close];
         [self.navigationController popViewControllerAnimated:YES];
     }
 }
@@ -361,6 +368,7 @@
             isEmpty = NO;
         }
     }
+    [db close];
     if (isEmpty) {
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:0];
         NSString *dateStr = [df stringFromDate:date];
@@ -378,9 +386,7 @@
             
             for (AVObject *temp in objects) {
                 NSString *uid = temp[@"uid"];
-                NSLog(@"%@", uid);
                 FMResultSet *resultset = [db executeQuery:@"select * from integralgained"];
-                [db open];
                 // 如果uid已经存在 则不需要再插入
                 BOOL isExits = NO;
                 while ([resultset next]) {
@@ -401,7 +407,6 @@
                     int gainreason = [temp[@"gainReason"] intValue];
                     [db executeUpdate:[NSString stringWithFormat:@"insert into integralgained (uid, useid, gaintime, integral, gainreason) values ('%@', '%@', '%@', %d, %d)", uid, userid, gaintime1, integral, gainreason]];
                 }
-                [db close];
             }
             [activityIndicatorView removeFromSuperview];
             if (!isShow) {
@@ -421,7 +426,6 @@
         if ([db open]) {
             for (AVObject *temp in objects) {
                 NSString *uid = temp[@"uid"];
-                NSLog(@"%@", uid);
                 FMResultSet *resultset = [db executeQuery:@"select * from sportrecord"];
                 // 如果uid已经存在 则不需要再插入
                 BOOL isExits = NO;
@@ -456,7 +460,6 @@
 //            [userDefaults setObject:[NSNumber numberWithInteger:totalTime+preTotalTime] forKey:@"totalTime"];
 //            [userDefaults setObject:[NSNumber numberWithFloat:totalDistance+preTotalDistance] forKey:@"totalDistance"];
 //            myAppDelegate.totalTrackDistance = (totalDistance+preTotalDistance)/1000;
-            [db close];
         }
         [db close];
     }];
@@ -545,6 +548,13 @@
             }
             [userDefaults setBool:NO forKey:@"isLogin"];
             [userDefaults setObject:@"" forKey:@"userId"];
+            // 删除本地数据库表的数据
+            FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
+            if ([db open]) {
+                [db executeUpdate:@"delete from integralgained"];
+                [db executeUpdate:@"delete from sportrecord"];
+            }
+            [db close];
             [self.navigationController popViewControllerAnimated:YES];
         }
     }else {

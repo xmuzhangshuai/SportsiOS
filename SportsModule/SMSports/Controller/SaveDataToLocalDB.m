@@ -13,7 +13,6 @@
 @implementation SaveDataToLocalDB
 
 + (BOOL)saveDataToSportScoreTempFinallyWithEndTime:(NSDate *)endTime PauseTime:(int)pauseTime MotionTrack:(NSString *)motionTrack Distance:(float)distance {
-    NSLog(@"endtime:%@", endTime);
     AppDelegate *myAppDelegate = [[UIApplication sharedApplication] delegate];
     FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
     [db open];
@@ -44,7 +43,6 @@
 }
 
 + (BOOL)saveDataToSportScoreTempFirstWithUId:(NSString *)uid UserId:(NSString *)userId SportType:(int)sportType StartTime:(NSDate *)startTime EndTime:(NSDate *)endtime PauseTime:(int)pauseTime MotionTrack:(NSString *)motionTrack Distance:(float)distance {
-    NSLog(@"starttime:%@", startTime);
     AppDelegate *myAppDelegate = [[UIApplication sharedApplication] delegate];
     FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
     [db open];

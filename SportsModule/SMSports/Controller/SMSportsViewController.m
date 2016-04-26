@@ -470,7 +470,7 @@
         [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
         startTime = [df dateFromString:startTimeString];
         // 如果usedtime为空 则显示0
-        if ([[self.userDefaults objectForKey:@"usedTime"] isEqualToString:@""]) {
+        if ([[self.userDefaults objectForKey:@"usedTime"] isEqualToString:@"00:00:00"]) {
             usedTimeLabel.text = [NSString stringWithFormat:@"%@", @"00:00:00"];
         }else {
             usedTimeLabel.text = [NSString stringWithFormat:@"%@", [self.userDefaults objectForKey:@"usedTime"]];
@@ -741,6 +741,9 @@
             [self.colorIndex addObject:[NSNumber numberWithInt:1]];
         }
     }
+    if (isPause) {
+        isPause = NO;
+    }
 //    if ([self.userDefaults boolForKey:@"isSportStop"]) {
 //        [self.locationArray removeObjectAtIndex:self.locationArray.count-1];
 //        self.colorIndex removeObjectAtIndex:self.colorIndex.count - 2
@@ -817,7 +820,7 @@
             NSTimeInterval endTimestamp = time(NULL);
             NSString *userId = [self.userDefaults objectForKey:@"userId"];
             duration = [self timeToInterval:usedTimeLabel.text];
-            NSString *distanceNumber = [NSString stringWithFormat:@"%.2f", TrackDistance/1000];
+            NSString *distanceNumber = [NSString stringWithFormat:@"%.2f", TrackDistance];
             CGFloat distance = [distanceNumber floatValue];
             NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
                                   userId, @"userId",
@@ -878,7 +881,7 @@
         NSTimeInterval endTimestamp = time(NULL);
         NSString *userId = [self.userDefaults objectForKey:@"userId"];
         duration = [self timeToInterval:usedTimeLabel.text];
-        NSString *distanceNumber = [NSString stringWithFormat:@"%.2f", TrackDistance/1000];
+        NSString *distanceNumber = [NSString stringWithFormat:@"%.2f", TrackDistance];
         CGFloat distance = [distanceNumber floatValue];
         NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
                               userId, @"userId",
@@ -1008,7 +1011,7 @@
 
 // 完成运动
 - (void)doneSport {
-    if (TrackDistance/1000 != 0) {
+    if (TrackDistance != 0) {
         /** 将运动记录保存到本地数据库临时表 */
         if ([self saveRecordToTempFinally]) {
             /** 将运动记录保存到服务器 */
@@ -1048,7 +1051,10 @@
                 NSString *userId = [self.userDefaults objectForKey:@"userId"];
                 //            [self intervalSinceNow:startTime];
                 duration = [self timeToInterval:usedTimeLabel.text];
-                NSString *distanceNumber = [NSString stringWithFormat:@"%.2f", TrackDistance/1000];
+                if (duration == 0) {
+                    duration = [self timeToInterval:usedTimeLabel.text];
+                }
+                NSString *distanceNumber = [NSString stringWithFormat:@"%.2f", TrackDistance];
                 CGFloat distance = [distanceNumber floatValue];
                 NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
                                       userId, @"userId",
@@ -1057,7 +1063,7 @@
                                       [NSNumber numberWithInt:duration], @"duration",
                                       [NSNumber numberWithLong:endTimestamp], @"endTimestamp",
                                       nil];
-                //            NSLog(@"userid%@, sporttype%@, distance%@, duration%@, endtimestamp%@", userId, sportType, [NSNumber numberWithFloat:TrackDistance/1000], [NSNumber numberWithInt:duration], [NSNumber numberWithLong:endTimestamp]);
+//                            NSLog(@"userid%@, sporttype%@, distance%@, duration%@, endtimestamp%@", userId, sportType, [NSNumber numberWithFloat:TrackDistance], [NSNumber numberWithInt:duration], [NSNumber numberWithLong:endTimestamp]);
                 
                 /** 请求服务器接口 */
                 [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
@@ -1073,12 +1079,23 @@
                         successFinishLabel.text = [NSString stringWithFormat:@"%@", integral];
                         /** 将获得积分结果写入本地数据库 */
 //                        [SaveDataToLocalDB saveDataToIntegralGained:self.myAppDelegate.currentUUID UserId:userId GainTime:endTime Integral:integralNumber GainReason:1];
-                        stopCount = 0;
+                        int sportType = 0;
+                        if ([sportMode isEqualToString:@"走"]) {
+                            sportType = 1;
+                        }else if ([sportMode isEqualToString:@"跑"]) {
+                            sportType = 2;
+                        }else if([sportMode isEqualToString:@"骑"]) {
+                            sportType = 3;
+                        }
+                        [SaveDataToLocalDB saveDataToSportScore:self.myAppDelegate.currentUUID UserId:[self.userDefaults objectForKey:@"userId"] SportType:sportType StartTime:startTime endTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance];
+
                         UIImage *screenView = [self screenView];
                         /** 沙盒目录 */
                         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
                         NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:[NSString stringWithFormat:@"screenView.png"]];   // 保存文件的名称
                         [UIImagePNGRepresentation(screenView)writeToFile:filePath atomically:YES]; // 保存成功会返回YES
+                        // 将usedtime置为0
+                        [self.userDefaults setObject:@"00:00:00" forKey:@"usedTime"];
                     }else {
                         [waitView removeFromSuperview];
                         NSString *errorMessage = object[@"errorMessage"];
@@ -1250,9 +1267,10 @@
             alertView.tag = 3;
             [alertView show];
             return NO;
-        }else {
-            [SaveDataToLocalDB saveDataToSportScore:self.myAppDelegate.currentUUID UserId:[self.userDefaults objectForKey:@"userId"] SportType:sportType StartTime:startTime endTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance];
         }
+//        }else {
+//            [SaveDataToLocalDB saveDataToSportScore:self.myAppDelegate.currentUUID UserId:[self.userDefaults objectForKey:@"userId"] SportType:sportType StartTime:startTime endTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance];
+//        }
     }else {
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"数据上传失败，请重试" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
         alertView.tag = 3;
