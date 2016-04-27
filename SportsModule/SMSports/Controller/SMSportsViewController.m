@@ -1070,6 +1070,7 @@
                     NSNumber *resultCode = object[@"resultCode"];
                     if ([resultCode intValue] == 200) {
                         [self.userDefaults setBool:NO forKey:@"isUploadRecord"];
+                        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"isInsert"];
                         [waitView removeFromSuperview];
                         NSNumber *integral = object[@"integralGained"];
                         int integralNumber = [integral intValue];
@@ -1079,15 +1080,6 @@
                         successFinishLabel.text = [NSString stringWithFormat:@"%@", integral];
                         /** 将获得积分结果写入本地数据库 */
 //                        [SaveDataToLocalDB saveDataToIntegralGained:self.myAppDelegate.currentUUID UserId:userId GainTime:endTime Integral:integralNumber GainReason:1];
-                        int sportType = 0;
-                        if ([sportMode isEqualToString:@"走"]) {
-                            sportType = 1;
-                        }else if ([sportMode isEqualToString:@"跑"]) {
-                            sportType = 2;
-                        }else if([sportMode isEqualToString:@"骑"]) {
-                            sportType = 3;
-                        }
-                        [SaveDataToLocalDB saveDataToSportScore:self.myAppDelegate.currentUUID UserId:[self.userDefaults objectForKey:@"userId"] SportType:sportType StartTime:startTime endTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance];
 
                         UIImage *screenView = [self screenView];
                         /** 沙盒目录 */
@@ -1260,8 +1252,9 @@
     }else if([sportMode isEqualToString:@"骑"]) {
         sportType = 3;
     }
-    
     if (endTime != nil) {
+        // 将此条数据存入本地数据库
+        [SaveDataToLocalDB saveDataToSportScore:self.myAppDelegate.currentUUID UserId:[self.userDefaults objectForKey:@"userId"] SportType:sportType StartTime:startTime endTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance];
         if (![SaveDataToLocalDB saveDataToSportScoreTempFinallyWithEndTime:endTime PauseTime:pauseTime MotionTrack:motionTrack Distance:TrackDistance]) {
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"数据上传失败，请重试" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
             alertView.tag = 3;

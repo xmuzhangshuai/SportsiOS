@@ -199,11 +199,11 @@
     cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"我的记录分割线"]];
     cell.backgroundView.contentMode = UIViewContentModeTop;
     if (tableViewSwitch) {
-        IntegralGainedHistory *integralGainedHistory = integralArray[indexPath.row];
+        IntegralGainedHistory *integralGainedHistory = integralArray[integralArray.count-1-indexPath.row];
         cell.textLabel.text = integralGainedHistory.gainedDate;
         cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)integralGainedHistory.integral];
     }else {
-        SportRecord *record = sportArray[indexPath.row];
+        SportRecord *record = sportArray[sportArray.count-indexPath.row-1];
         cell.textLabel.text = record.sportDate;
         cell.detailTextLabel.text = record.distanceAndTime;
     }
@@ -265,6 +265,7 @@
             NSDateFormatter *df = [[NSDateFormatter alloc] init];
             SportRecord *record = [[SportRecord alloc] init];
             record.sportDate = starttimeArray[0];
+            [df setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
             [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
             NSTimeInterval secondTime = [self intervalFrom:[df dateFromString:starttimeStr] to:[df dateFromString:endtimeStr]];
             NSString *time = [self intervalToTime:secondTime];

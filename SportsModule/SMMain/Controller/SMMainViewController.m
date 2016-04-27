@@ -526,25 +526,31 @@
     if (alertView.tag == 3) {
         if (buttonIndex == 0) {
             // 上传当前的运动记录
-            if ([SaveDataToServer saveDateToSportScore]) {
-                [userDefaults setBool:NO forKey:@"isSport"];
-                [userDefaults setBool:NO forKey:@"isSportStop"];
-                
-                /** 请求服务器接口 */
-                NSDictionary *dict = [userDefaults objectForKey:@"MainToUpload"];
-                [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
-                    NSNumber *resultCode = object[@"resultCode"];
-                    if ([resultCode intValue] == 200) {
-                        [userDefaults setBool:NO forKey:@"isUploadRecord"];
-                    }else {
-                        NSString *errorMessage = object[@"errorMessage"];
-                        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:errorMessage delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
-                        alertView.tag = 1;
-                        [alertView show];
-                    }
-                }];
+            NSDictionary *dict = [userDefaults objectForKey:@"MainToUpload"];
+            CGFloat distance = [dict[@"distance"] floatValue];
+            if (distance != 0) {
+                if ([SaveDataToServer saveDateToSportScore]) {
+                    [userDefaults setBool:NO forKey:@"isSport"];
+                    [userDefaults setBool:NO forKey:@"isSportStop"];
+                    
+                    /** 请求服务器接口 */
+                    
+                    [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
+                        NSNumber *resultCode = object[@"resultCode"];
+                        if ([resultCode intValue] == 200) {
+                            [userDefaults setBool:NO forKey:@"isUploadRecord"];
+                        }else {
+                            NSString *errorMessage = object[@"errorMessage"];
+                            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:errorMessage delegate:self cancelButtonTitle:@"知道了" otherButtonTitles:nil, nil];
+                            alertView.tag = 1;
+                            [alertView show];
+                        }
+                    }];
+                }else {
+                    NSLog(@"数据上传失败");
+                }
             }else {
-                NSLog(@"数据上传失败");
+            
             }
             [userDefaults setBool:NO forKey:@"isLogin"];
             [userDefaults setObject:@"" forKey:@"userId"];

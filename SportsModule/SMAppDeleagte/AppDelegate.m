@@ -39,7 +39,6 @@
 
 @implementation AppDelegate
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.userDefaults = [NSUserDefaults standardUserDefaults];
@@ -51,6 +50,7 @@
         [self.userDefaults setBool:NO forKey:@"isSportStop"];
         [self.userDefaults setObject:[NSNumber numberWithInteger:0] forKey:@"totalTime"];
         [self.userDefaults setObject:[NSNumber numberWithFloat:0] forKey:@"totalDistance"];
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"isInsert"];
     }
     
     // 数据库创建

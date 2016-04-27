@@ -67,10 +67,14 @@
     FMDatabase *db = [FMDatabase databaseWithPath:myAppDelegate.dataBasePath];
     [db open];
     NSString *query;
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"isInsert"]) {
+        return YES;
+    }
     query = [NSString stringWithFormat:@"insert into sportrecord (uid, userid, sporttype, starttime, endtime, pausetime, motiontrack, distance) values ('%@', '%@', %d, '%@', '%@', %d, '%@', %f)", uid, userId, sportType, startTime, endTime, pauseTime, motionTrack, distance];
     BOOL success = [db executeUpdate:query];
     if (success) {
         [db close];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"isInsert"];
         return YES;
     }
     [db close];

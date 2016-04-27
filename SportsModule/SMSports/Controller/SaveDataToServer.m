@@ -10,6 +10,7 @@
 #import <AVOSCloud/AVOSCloud.h>
 #import <FMDB/FMDB.h>
 #import "AppDelegate.h"
+#import "SaveDataToLocalDB.h"
 
 @implementation SaveDataToServer
 
@@ -109,21 +110,24 @@
         
 //        NSLog(@"uid%@, userID%@, sporttype%@, starttime%@, endtime%@, pausetime%d, motiontrack%@, distance%f", uId, userId, [NSNumber numberWithInt:sportMode], startTime, endTime, pauseTime, motionTrack, trackDistance
 //              );
-        
-        if (![userDefaults boolForKey:@"isUploadRecord"]) {
-            AVObject *newSport = [AVObject objectWithClassName:@"SportRecord"];
-            [newSport setObject:uId forKey:@"uid"];
-            [newSport setObject:userId forKey:@"userID"];
-            [newSport setObject:[NSNumber numberWithInt:sportMode] forKey:@"sportType"];
-            [newSport setObject:startTime forKey:@"startTime"];
-            [newSport setObject:endTime forKey:@"endTime"];
-            [newSport setObject:[NSNumber numberWithInt:pauseTime] forKey:@"pauseTime"];
-            [newSport setObject:motionTrack forKey:@"motionTrack"];
-            [newSport setObject:[NSNumber numberWithFloat:trackDistance] forKey:@"distance"];
-            isUpload = [newSport save];
-            if (isUpload) {
-                [userDefaults setBool:YES forKey:@"isUploadRecord"];
+        if (endTime != nil) {
+            if (![userDefaults boolForKey:@"isUploadRecord"]) {
+                AVObject *newSport = [AVObject objectWithClassName:@"SportRecord"];
+                [newSport setObject:uId forKey:@"uid"];
+                [newSport setObject:userId forKey:@"userID"];
+                [newSport setObject:[NSNumber numberWithInt:sportMode] forKey:@"sportType"];
+                [newSport setObject:startTime forKey:@"startTime"];
+                [newSport setObject:endTime forKey:@"endTime"];
+                [newSport setObject:[NSNumber numberWithInt:pauseTime] forKey:@"pauseTime"];
+                [newSport setObject:motionTrack forKey:@"motionTrack"];
+                [newSport setObject:[NSNumber numberWithFloat:trackDistance] forKey:@"distance"];
+                isUpload = [newSport save];
+                if (isUpload) {
+                    [userDefaults setBool:YES forKey:@"isUploadRecord"];
+                }
             }
+        }else {
+            return NO;
         }
     }
     [db close];
