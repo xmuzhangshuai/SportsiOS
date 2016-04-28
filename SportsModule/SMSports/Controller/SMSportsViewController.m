@@ -145,6 +145,7 @@
     NSString    *motionTrack;           // 运动轨迹
     CGFloat     TrackDistance;          // 运动里程
     CGFloat     currentDistance;        // 记录当前运动里程
+    NSUInteger  currentMinute;          // 记录当前运动时间的分钟
     
     NSTimer     *countTimeTimer;        // 运动时间计时器
     NSTimer     *saveDataPer3MinTimer;  // 存储数据计时器
@@ -191,6 +192,7 @@
         stopCount           = 0;
         isSpot              = NO;
         isGoon              = NO;
+        currentMinute       = -1;
         
         self.userDefaults   = [NSUserDefaults standardUserDefaults];
         self.myAppDelegate  = [[UIApplication sharedApplication] delegate];
@@ -235,6 +237,7 @@
         stopCount           = 0;
         isSpot              = NO;
         isGoon              = NO;
+        currentMinute       = -1;
         
         self.userDefaults   = [NSUserDefaults standardUserDefaults];
         
@@ -384,8 +387,8 @@
     cover.alpha = 0;
     cover.backgroundColor = [UIColor blackColor];
     cover.hidden = YES;
-    UITapGestureRecognizer *continueSportMenu = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(continueSport)];
-    [cover addGestureRecognizer:continueSportMenu];
+//    UITapGestureRecognizer *continueSportMenu = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(continueSport)];
+//    [cover addGestureRecognizer:continueSportMenu];
     [self.view addSubview:cover];
     
     stopImageView.frame = CGRectMake(0, 0, 1, 1);
@@ -579,9 +582,9 @@
     if ([sportMode isEqualToString:@"跑"]) {
         self.bmkLocationService.distanceFilter = 3;
     }else if([sportMode isEqualToString:@"走"]) {
-        self.bmkLocationService.distanceFilter = 1;
+        self.bmkLocationService.distanceFilter = 3;
     }else if([sportMode isEqualToString:@"骑"]){
-        self.bmkLocationService.distanceFilter = 5;
+        self.bmkLocationService.distanceFilter = 3;
     }
     self.bmkLocationService.desiredAccuracy = kCLLocationAccuracyBest;
     self.bmkLocationService.delegate = self;
@@ -668,7 +671,7 @@
         BMKPolylineView* polylineView = [[BMKPolylineView alloc] initWithOverlay:overlay];
 //        polylineView.strokeColor = [[UIColor colorWithRed:0 green:0 blue:0 alpha:1] colorWithAlphaComponent:1];
         polylineView.colors = [NSArray arrayWithObjects:[UIColor colorWithRed:0 green:0 blue:0 alpha:0], [UIColor colorWithRed:0 green:0 blue:0 alpha:1], nil];
-        polylineView.lineWidth = 5.0;
+        polylineView.lineWidth = 3.0;
         return polylineView;
     }
     
@@ -1316,12 +1319,14 @@
     }
     usedTimeLabel.text = finallyTime;
     // 语音合成
-    if ((minute % 15 == 0 && minute > 15) || TrackDistance-currentDistance > 1000) {
+    if ((minute % 1 == 0 && currentMinute != minute && minute > 0) || TrackDistance-currentDistance > 1000) {
         // 计算平局速度
+        currentMinute = minute;
         currentDistance = TrackDistance;
         int totalSeconod = 3600*hour+minute*60+second;
         CGFloat averageSpeed = (TrackDistance/1000/totalSeconod)*3600; // 平均速度，公里/小时
-        [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.1f公里, 平均速度%.1f公里每小时", TrackDistance/1000, averageSpeed]];
+        [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.2f公里, 平均速度%.2f公里每小时", TrackDistance/1000, averageSpeed]];
+//        NSLog(@"%f", TrackDistance);
     }
 }
 
@@ -1439,6 +1444,10 @@
 //    self.bmkLocationService.delegate = self;
     //启动LocationService
     [self.bmkLocationService startUserLocationService];
+    [countTimeTimer setFireDate:[NSDate distantFuture]];
+    [countTimeTimer setFireDate:[NSDate distantPast]];
+    [saveDataPer3MinTimer setFireDate:[NSDate distantFuture]];
+    [saveDataPer3MinTimer setFireDate:[NSDate distantPast]];
 }
 
 
