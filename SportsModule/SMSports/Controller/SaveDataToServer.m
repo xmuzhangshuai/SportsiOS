@@ -121,8 +121,22 @@
                 [newSport setObject:[NSNumber numberWithInt:pauseTime] forKey:@"pauseTime"];
                 [newSport setObject:motionTrack forKey:@"motionTrack"];
                 [newSport setObject:[NSNumber numberWithFloat:trackDistance] forKey:@"distance"];
-                isUpload = [newSport save];
-                if (isUpload) {
+                NSLog(@"是否上传成功%d", isUpload);
+                NSError *error;
+                isUpload = [newSport save:&error];
+//                [newSport saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+//                    //
+//                    if (succeeded) {
+//                        // 上传成功 通知
+//                        [[NSNotificationCenter defaultCenter] postNotificationName:@"updateRecordSuccess" object:nil];
+//                    }else {
+//                        // 上传失败 通知
+//                        [[NSNotificationCenter defaultCenter] postNotificationName:@"updateRecordFailed" object:nil];
+//                    }
+//                }];
+                NSLog(@"是否上传成功%d", isUpload);
+                NSLog(@"%@", error);
+                if (isUpload && (error == nil)) {
                     [userDefaults setBool:YES forKey:@"isUploadRecord"];
                 }
             }

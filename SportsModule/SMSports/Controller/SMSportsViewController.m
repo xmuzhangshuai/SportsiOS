@@ -1011,6 +1011,7 @@
 
 // 完成运动
 - (void)doneSport {
+    self.navigationItem.rightBarButtonItem.enabled = NO;
     if (TrackDistance != 0) {
         /** 将运动记录保存到本地数据库临时表 */
         if ([self saveRecordToTempFinally]) {
@@ -1071,6 +1072,9 @@
                     if ([resultCode intValue] == 200) {
                         [self.userDefaults setBool:NO forKey:@"isUploadRecord"];
                         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"isInsert"];
+                        // starttime 和 endtime 要置为空
+                        startTime = nil;
+                        endTime = nil;
                         [waitView removeFromSuperview];
                         NSNumber *integral = object[@"integralGained"];
                         int integralNumber = [integral intValue];
@@ -1089,6 +1093,7 @@
                         // 将usedtime置为0
                         [self.userDefaults setObject:@"00:00:00" forKey:@"usedTime"];
                     }else {
+                        self.navigationItem.rightBarButtonItem.enabled = YES;
                         [waitView removeFromSuperview];
                         NSString *errorMessage = object[@"errorMessage"];
                         if ([errorMessage isEqualToString:@"error params"]) {
@@ -1099,6 +1104,7 @@
                     }
                 }];
             }else {
+                self.navigationItem.rightBarButtonItem.enabled = YES;
                 [waitView removeFromSuperview];
                 // 提示保存失败
                 UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"保存数据失败，请重试" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
@@ -1106,11 +1112,13 @@
             }
         }else {
             // 提示保存失败
+            self.navigationItem.rightBarButtonItem.enabled = YES;
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"保存数据失败，请重试" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
             [alertView show];
         }
     }else {
         // 还没有动哦
+        self.navigationItem.rightBarButtonItem.enabled = YES;
         [self.userDefaults setBool:NO forKey:@"isSport"];
         [self.userDefaults setBool:NO forKey:@"isSportStop"];
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"本次运动距离为0" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
@@ -1124,6 +1132,7 @@
  *  开始一次新的运动 运动类型不变
  **/
 - (void)continueAnotherSport {
+    self.navigationItem.rightBarButtonItem.enabled = YES;
     isBegin             = NO;
     isPause             = NO;
     [self.userDefaults setBool:NO forKey:@"isSportStop"];
