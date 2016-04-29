@@ -87,6 +87,7 @@
     // 一些全局变量的初始化
     self.currentUUID = @"";
     
+    
     [self.window makeKeyAndVisible];
     
     return YES;
@@ -100,7 +101,7 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-    BOOL backgroundAccepted = [[UIApplication sharedApplication] setKeepAliveTimeout:600 handler:^{ [self backgroundHandler]; }];
+    BOOL backgroundAccepted = [[UIApplication sharedApplication] setKeepAliveTimeout:180 handler:^{ [self backgroundHandler]; }];
     if (backgroundAccepted)
     {
         NSLog(@"backgrounding accepted");
@@ -190,11 +191,9 @@
         // 比如我这里是发送广播, 重新激活定位
         // 取得ios系统唯一的全局的广播站 通知中心
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-        //设置广播内容
-        NSDictionary *dict = [[NSDictionary alloc]init];
         //将内容封装到广播中 给ios系统发送广播
         // LocationTheme频道
-        [nc postNotificationName:@"LocationTheme" object:self userInfo:dict];
+        [nc postNotificationName:@"LocationTheme" object:self userInfo:nil];
     });
 }
 

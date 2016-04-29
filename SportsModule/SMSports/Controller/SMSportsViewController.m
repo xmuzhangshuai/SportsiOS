@@ -1325,8 +1325,8 @@
         currentDistance = TrackDistance;
         int totalSeconod = 3600*hour+minute*60+second;
         CGFloat averageSpeed = (TrackDistance/1000/totalSeconod)*3600; // 平均速度，公里/小时
-        [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.2f公里, 平均速度%.2f公里每小时", TrackDistance/1000, averageSpeed]];
-//        NSLog(@"%f", TrackDistance);
+        [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.2f公里, 平均速度%.2f公里每小时,程序运行了%@", TrackDistance/1000, averageSpeed, usedTimeLabel.text]];
+        NSLog(@"%f", TrackDistance);
     }
 }
 
