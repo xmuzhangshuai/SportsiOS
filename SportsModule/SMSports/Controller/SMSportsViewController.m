@@ -606,6 +606,11 @@
  *  用户改变位置调用
  **/
 - (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation {
+//    NSLog(@"定位点%@", userLocation.location);
+//    NSLog(@"水平偏移：%f  竖直偏移：%f", userLocation.location.verticalAccuracy, userLocation.location.horizontalAccuracy);
+    if (userLocation.location.horizontalAccuracy > 30) {
+        return;
+    }
     self.mapView.showsUserLocation = YES;
     [self.mapView updateLocationData:userLocation];
     self.mapView.centerCoordinate = userLocation.location.coordinate;
@@ -1319,13 +1324,13 @@
     }
     usedTimeLabel.text = finallyTime;
     // 语音合成
-    if ((minute % 1 == 0 && currentMinute != minute && minute > 0) || TrackDistance-currentDistance > 1000) {
+    if ((minute % 15 == 0 && currentMinute != minute && minute > 0) || TrackDistance-currentDistance > 1000) {
         // 计算平局速度
         currentMinute = minute;
         currentDistance = TrackDistance;
         int totalSeconod = 3600*hour+minute*60+second;
         CGFloat averageSpeed = (TrackDistance/1000/totalSeconod)*3600; // 平均速度，公里/小时
-        [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.2f公里, 平均速度%.2f公里每小时,程序运行了%@", TrackDistance/1000, averageSpeed, usedTimeLabel.text]];
+        [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.2f公里, 平均速度%.2f公里每小时", TrackDistance/1000, averageSpeed]];
         NSLog(@"%f", TrackDistance);
     }
 }
