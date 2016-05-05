@@ -1115,13 +1115,13 @@
                 self.navigationItem.rightBarButtonItem.enabled = YES;
                 [waitView removeFromSuperview];
                 // 提示保存失败
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"保存数据失败，请重试" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"数据库保存数据失败，请重试" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
                 [alertView show];
             }
         }else {
             // 提示保存失败
             self.navigationItem.rightBarButtonItem.enabled = YES;
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"保存数据失败，请重试" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"本地保存数据失败，请重试" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
             [alertView show];
         }
     }else {
@@ -1160,6 +1160,7 @@
     //设置当前地图的显示范围，直接显示到用户位置
     BMKCoordinateRegion adjustRegion = [self.mapView regionThatFits:BMKCoordinateRegionMake(self.bmkLocationService.userLocation.location.coordinate, BMKCoordinateSpanMake(0.02f,0.02f))];
     [self.mapView setRegion:adjustRegion animated:YES];
+    [self BMKMapViewInit];
     [self sportDataInit];
 }
 
@@ -1292,7 +1293,6 @@
 
 /** 运动时间计时 */
 - (void)countTime {
-    if ([self.userDefaults boolForKey:@"isSport"]) {
         NSArray *array = [usedTimeLabel.text componentsSeparatedByString:@":"];
         int second = [[array objectAtIndex:2] intValue];
         int minute = [[array objectAtIndex:1] intValue];
@@ -1334,7 +1334,6 @@
             [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.2f公里, 平均速度%.2f公里每小时", TrackDistance/1000, averageSpeed]];
             NSLog(@"%f", TrackDistance);
         }
-    }
 }
 
 /**
