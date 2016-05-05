@@ -101,7 +101,7 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-    BOOL backgroundAccepted = [[UIApplication sharedApplication] setKeepAliveTimeout:180 handler:^{ [self backgroundHandler]; }];
+    BOOL backgroundAccepted = [[UIApplication sharedApplication] setKeepAliveTimeout:600 handler:^{ [self backgroundHandler]; }];
     if (backgroundAccepted)
     {
         NSLog(@"backgrounding accepted");
