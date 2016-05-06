@@ -512,7 +512,9 @@
             NSDate *starttime = [df dateFromString:starttimeStr];
             NSDate *endtime = [df dateFromString:endtimeStr];
             CGFloat distance = [resultset doubleForColumn:@"distance"];
+            NSInteger pauseTime = [resultset intForColumn:@"pausetime"];
             totalTime += [self intervalFrom:starttime to:endtime];
+            totalTime -= pauseTime;
             totalDistance += distance;
         }
         detailsTime.text = [self intervalToTime:totalTime];

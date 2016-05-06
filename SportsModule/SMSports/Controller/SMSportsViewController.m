@@ -101,6 +101,8 @@
 @property (nonatomic, strong) AppDelegate *myAppDelegate;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
 
+@property (nonatomic, assign) NSUInteger missPointCount;    // 定位失效次数
+
 @end
 
 @implementation SMSportsViewController {
@@ -155,6 +157,8 @@
     
     NSUInteger  stopCount;              // 计算一次运动中的暂停次数
     
+    UIAlertView *globalAlertView;
+    
     /** 讯飞语音 */
     IFlySpeechSynthesizer   *_iFlySpeechSynthesizer;
 }
@@ -193,6 +197,7 @@
         isSpot              = NO;
         isGoon              = NO;
         currentMinute       = -1;
+        self.missPointCount = 0;
         
         self.userDefaults   = [NSUserDefaults standardUserDefaults];
         self.myAppDelegate  = [[UIApplication sharedApplication] delegate];
@@ -238,6 +243,7 @@
         isSpot              = NO;
         isGoon              = NO;
         currentMinute       = -1;
+        self.missPointCount = 0;
         
         self.userDefaults   = [NSUserDefaults standardUserDefaults];
         
@@ -609,8 +615,15 @@
 //    NSLog(@"定位点%@", userLocation.location);
 //    NSLog(@"水平偏移：%f  竖直偏移：%f", userLocation.location.verticalAccuracy, userLocation.location.horizontalAccuracy);
     if (userLocation.location.horizontalAccuracy > 30) {
+        self.missPointCount++;
+        if (self.missPointCount > 2 && globalAlertView == nil) {
+            globalAlertView = [[UIAlertView alloc] initWithTitle:@"" message:@"请移步到户外空旷处，以免运动定位不准确" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
+            globalAlertView.tag = 20;
+            [globalAlertView show];
+        }
         return;
     }
+    self.missPointCount = 0;
     self.mapView.showsUserLocation = YES;
     [self.mapView updateLocationData:userLocation];
     self.mapView.centerCoordinate = userLocation.location.coordinate;
@@ -848,6 +861,9 @@
         [self.navigationController popViewControllerAnimated:YES];
     }else if (alertView.tag == 3){
         // 不做处理
+    }else if (alertView.tag == 20){
+        self.missPointCount = 0;
+        globalAlertView = nil;
     }
 }
 

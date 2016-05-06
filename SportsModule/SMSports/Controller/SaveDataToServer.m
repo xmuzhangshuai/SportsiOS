@@ -37,7 +37,7 @@
         CGFloat trackDistance = [resultSet doubleForColumn:@"distance"];
         NSString *endTimeStr = [resultSet stringForColumn:@"endTime"];
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
-        [df setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+//        [df setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
         [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
         NSDate *endTime = [df dateFromString:endTimeStr];
         NSString *uId = [resultSet stringForColumn:@"uid"];
@@ -103,7 +103,7 @@
         CGFloat trackDistance = [resultSet doubleForColumn:@"distance"];
         NSString *endTimeStr = [resultSet stringForColumn:@"endtime"];
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
-        [df setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+//        [df setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
         [df setDateFormat:@"yyyy-MM-dd HH:mm:ss +0000"];
         NSDate *startTime = [df dateFromString:startTimeStr];
         NSDate *endTime = [df dateFromString:endTimeStr];

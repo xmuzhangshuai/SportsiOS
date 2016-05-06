@@ -61,6 +61,7 @@
     
     // LeanCloud ID设置
     [AVOSCloud setApplicationId:@"WGUoySgrc7k8FVz2dvWNkJAd-gzGzoHsz" clientKey:@"vHarYvaUm7SuGQQSoOFGVA4m"];
+//    [AVOSCloud setApplicationId:@"xK8C3FhlkUbAQz8vBVIprCvS-gzGzoHsz" clientKey:@"6Vg4RTuGKj6VbH6W7jw9EY4R"];
     
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     // 主界面 登陆
