@@ -614,7 +614,7 @@
 - (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation {
 //    NSLog(@"定位点%@", userLocation.location);
 //    NSLog(@"水平偏移：%f  竖直偏移：%f", userLocation.location.verticalAccuracy, userLocation.location.horizontalAccuracy);
-    if (userLocation.location.horizontalAccuracy > 30) {
+    if (userLocation.location.horizontalAccuracy > 30 && !isContinue) {
         self.missPointCount++;
         if (self.missPointCount > 2 && globalAlertView == nil) {
             globalAlertView = [[UIAlertView alloc] initWithTitle:@"" message:@"请移步到户外空旷处，以免运动定位不准确" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
@@ -715,6 +715,11 @@
  *  记录运动轨迹
  **/
 - (void)TrailRouteWithUserLocation:(BMKUserLocation *)userLocation {
+    if (userLocation.location.horizontalAccuracy > 30) {
+        globalAlertView = [[UIAlertView alloc] initWithTitle:@"" message:@"请移步到户外空旷处，以免运动定位不准确" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
+        globalAlertView.tag = 20;
+        [globalAlertView show];
+    }
     if (self.preLocation) {
         CGFloat distance = [userLocation.location distanceFromLocation:self.preLocation];
         if ([sportMode isEqualToString:@"跑"]) {
