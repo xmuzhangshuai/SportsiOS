@@ -1060,6 +1060,9 @@
                 [saveDataPer3MinTimer invalidate];
                 saveDataPer3MinTimer = nil;
                 
+                _iFlySpeechSynthesizer = nil;
+                _iFlySpeechSynthesizer.delegate = nil;
+                
                 /** 将暂停界面去掉后截图 */
                 if (isStopMenu) {
                     [self hiddenStopMenu];
@@ -1184,6 +1187,7 @@
     [self.mapView setRegion:adjustRegion animated:YES];
     [self BMKMapViewInit];
     [self sportDataInit];
+    [self IFlyInit];
 }
 
 - (void)showStopMenu {
@@ -1315,7 +1319,6 @@
 
 /** 运动时间计时 */
 - (void)countTime {
-    NSLog(@"在计时");
     NSArray *array = [usedTimeLabel.text componentsSeparatedByString:@":"];
     int second = [[array objectAtIndex:2] intValue];
     int minute = [[array objectAtIndex:1] intValue];

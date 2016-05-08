@@ -102,11 +102,11 @@
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
     if ([self.userDefaults boolForKey:@"isSport"]) {
-        BOOL backgroundAccepted = [[UIApplication sharedApplication] setKeepAliveTimeout:600 handler:^{ [self backgroundHandler]; }];
-        if (backgroundAccepted)
-        {
-            NSLog(@"backgrounding accepted");
-        }
+//        BOOL backgroundAccepted = [[UIApplication sharedApplication] setKeepAliveTimeout:600 handler:^{ [self backgroundHandler]; }];
+//        if (backgroundAccepted)
+//        {
+//            NSLog(@"backgrounding accepted");
+//        }
         [self backgroundHandler];
     }
 }
