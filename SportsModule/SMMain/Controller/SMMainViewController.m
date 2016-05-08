@@ -514,7 +514,6 @@
             CGFloat distance = [resultset doubleForColumn:@"distance"];
             NSInteger pauseTime = [resultset intForColumn:@"pausetime"];
             totalTime += [self intervalFrom:starttime to:endtime];
-            NSLog(@"毫秒：%ld", (long)pauseTime);
             totalTime -= pauseTime/1000;
             totalDistance += distance;
         }

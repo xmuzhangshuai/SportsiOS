@@ -20,5 +20,8 @@
 /** 记录当前的运动uId 类型UUID */
 @property (nonatomic) NSString  *currentUUID;
 
+/** 后台定位 */
+@property (nonatomic, unsafe_unretained) UIBackgroundTaskIdentifier bgTask;
+
 @end
 

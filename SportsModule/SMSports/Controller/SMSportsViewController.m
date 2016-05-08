@@ -1060,13 +1060,10 @@
                 [saveDataPer3MinTimer invalidate];
                 saveDataPer3MinTimer = nil;
                 
-                
                 /** 将暂停界面去掉后截图 */
                 if (isStopMenu) {
                     [self hiddenStopMenu];
                 }
-                
-                
                 
                 // 计算出多少积分并且提醒用户 还要往本地数据库积分表写入数据
                 NSNumber *sportType;
@@ -1099,6 +1096,10 @@
                 [AVCloud callFunctionInBackground:@"GainIntegralByPersonalSport" withParameters:dict block:^(id object, NSError *error) {
                     NSNumber *resultCode = object[@"resultCode"];
                     if ([resultCode intValue] == 200) {
+                        // 结束后台运动
+                        UIApplication* app = [UIApplication sharedApplication];
+                        [app endBackgroundTask:_myAppDelegate.bgTask];
+                        
                         [self.userDefaults setBool:NO forKey:@"isUploadRecord"];
                         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"isInsert"];
                         // starttime 和 endtime 要置为空
@@ -1314,47 +1315,49 @@
 
 /** 运动时间计时 */
 - (void)countTime {
-        NSArray *array = [usedTimeLabel.text componentsSeparatedByString:@":"];
-        int second = [[array objectAtIndex:2] intValue];
-        int minute = [[array objectAtIndex:1] intValue];
-        int hour = [[array objectAtIndex:0] intValue];
-        second++;
-        second %= 60;
-        if ((second %= 60) == 0) {
-            minute++;
-            minute %= 60;
-            if ((minute %= 60) == 0) {
-                hour++;
-                hour %= 24;
-            }
+    NSLog(@"在计时");
+    NSArray *array = [usedTimeLabel.text componentsSeparatedByString:@":"];
+    int second = [[array objectAtIndex:2] intValue];
+    int minute = [[array objectAtIndex:1] intValue];
+    int hour = [[array objectAtIndex:0] intValue];
+    second++;
+    second %= 60;
+    if ((second %= 60) == 0) {
+        minute++;
+        minute %= 60;
+        if ((minute %= 60) == 0) {
+            hour++;
+            hour %= 24;
         }
-        NSString *finallyTime = @"";
-        if (hour < 10) {
-            finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"0%d:", hour]];
-        }else {
-            finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"%d:", hour]];
-        }
-        if (minute < 10) {
-            finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"0%d:", minute]];
-        }else {
-            finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"%d:", minute]];
-        }
-        if (second < 10) {
-            finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"0%d", second]];
-        }else {
-            finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"%d", second]];
-        }
-        usedTimeLabel.text = finallyTime;
-        // 语音合成
-        if ((minute % 15 == 0 && currentMinute != minute && minute > 0) || TrackDistance-currentDistance > 1000) {
-            // 计算平局速度
-            currentMinute = minute;
-            currentDistance = TrackDistance;
-            int totalSeconod = 3600*hour+minute*60+second;
-            CGFloat averageSpeed = (TrackDistance/1000/totalSeconod)*3600; // 平均速度，公里/小时
-            [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.2f公里, 平均速度%.2f公里每小时", TrackDistance/1000, averageSpeed]];
-            NSLog(@"%f", TrackDistance);
-        }
+    }
+    NSString *finallyTime = @"";
+    if (hour < 10) {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"0%d:", hour]];
+    }else {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"%d:", hour]];
+    }
+    if (minute < 10) {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"0%d:", minute]];
+    }else {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"%d:", minute]];
+    }
+    if (second < 10) {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"0%d", second]];
+    }else {
+        finallyTime = [finallyTime stringByAppendingString:[NSString stringWithFormat:@"%d", second]];
+    }
+    usedTimeLabel.text = finallyTime;
+    // 语音合成
+    if ((minute % 15 == 0 && currentMinute != minute && minute > 0) || TrackDistance-currentDistance > 1000) {
+        // 计算平局速度
+        currentMinute = minute;
+        currentDistance = TrackDistance;
+        int totalSeconod = 3600*hour+minute*60+second;
+        CGFloat averageSpeed = (TrackDistance/1000/totalSeconod)*3600; // 平均速度，公里/小时
+        NSLog(@"播报语音");
+        [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.2f公里, 平均速度%.2f公里每小时", TrackDistance/1000, averageSpeed]];
+        NSLog(@"%f", TrackDistance);
+    }
 }
 
 /**
@@ -1470,6 +1473,7 @@
 //    self.bmkLocationService = [[BMKLocationService alloc]init];
 //    self.bmkLocationService.delegate = self;
     //启动LocationService
+    NSLog(@"收到通知");
     if ([self.userDefaults boolForKey:@"isSport"]) {
         [self.bmkLocationService startUserLocationService];
         [countTimeTimer setFireDate:[NSDate distantFuture]];

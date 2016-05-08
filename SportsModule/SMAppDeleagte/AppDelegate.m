@@ -32,8 +32,7 @@
 @property (nonatomic, strong) BMKMapManager *mapManager;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
 
-/** 后台定位 */
-@property (nonatomic, unsafe_unretained) UIBackgroundTaskIdentifier bgTask;
+
 
 @end
 
@@ -102,12 +101,14 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-    BOOL backgroundAccepted = [[UIApplication sharedApplication] setKeepAliveTimeout:600 handler:^{ [self backgroundHandler]; }];
-    if (backgroundAccepted)
-    {
-        NSLog(@"backgrounding accepted");
+    if ([self.userDefaults boolForKey:@"isSport"]) {
+        BOOL backgroundAccepted = [[UIApplication sharedApplication] setKeepAliveTimeout:600 handler:^{ [self backgroundHandler]; }];
+        if (backgroundAccepted)
+        {
+            NSLog(@"backgrounding accepted");
+        }
+        [self backgroundHandler];
     }
-    [self backgroundHandler];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -194,7 +195,9 @@
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         //将内容封装到广播中 给ios系统发送广播
         // LocationTheme频道
-        [nc postNotificationName:@"LocationTheme" object:self userInfo:nil];
+        if ([self.userDefaults boolForKey:@"isSport"]) {
+            [nc postNotificationName:@"LocationTheme" object:self userInfo:nil];
+        }
     });
 }
 
