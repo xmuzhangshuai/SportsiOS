@@ -163,6 +163,9 @@
     
     /** 讯飞语音 */
     IFlySpeechSynthesizer   *_iFlySpeechSynthesizer;
+    
+    // 定位重启定时器
+    NSTimer     *resetTimer;
 }
 
 /** 运动中初始化函数 */
@@ -203,8 +206,7 @@
         
         self.userDefaults   = [NSUserDefaults standardUserDefaults];
         self.myAppDelegate  = [[UIApplication sharedApplication] delegate];
-        
-        
+
     }
     
     return self;
@@ -606,6 +608,7 @@
         //运动中的的状态，需要绘制出先前的路线
     
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(activeLocation:) name:@"LocationTheme" object:nil];
+    resetTimer = [NSTimer scheduledTimerWithTimeInterval:300 target:self selector:@selector(activeLocation:) userInfo:nil repeats:YES];
 }
 
 #pragma mark - 百度地图代理
@@ -1322,6 +1325,7 @@
 
 /** 运动时间计时 */
 - (void)countTime {
+//    NSLog(@"程序后台剩余时间：%f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
     NSArray *array = [usedTimeLabel.text componentsSeparatedByString:@":"];
     int second = [[array objectAtIndex:2] intValue];
     int minute = [[array objectAtIndex:1] intValue];
@@ -1360,9 +1364,10 @@
         currentDistance = TrackDistance;
         int totalSeconod = 3600*hour+minute*60+second;
         CGFloat averageSpeed = (TrackDistance/1000/totalSeconod)*3600; // 平均速度，公里/小时
-        NSLog(@"播报语音");
+        
         [_iFlySpeechSynthesizer startSpeaking:[NSString stringWithFormat:@"您当前跑了%.2f公里, 平均速度%.2f公里每小时", TrackDistance/1000, averageSpeed]];
         NSLog(@"%f", TrackDistance);
+//        NSLog(@"语音播报后程序后台剩余时间：%f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
     }
 }
 
@@ -1472,7 +1477,7 @@
 /**
  *  后台调用方法
  **/
-/*
+
 - (void) activeLocation:(NSNotification *)notify
 {
 //    [self.bmkLocationService stopUserLocationService];
@@ -1480,9 +1485,10 @@
 //    self.bmkLocationService = [[BMKLocationService alloc]init];
 //    self.bmkLocationService.delegate = self;
     //启动LocationService
-    NSLog(@"收到通知");
-    if ([self.userDefaults boolForKey:@"isSport"]) {
-//        [self.bmkLocationService startUserLocationService];
+    NSLog(@"重启定位");
+    if (![self.userDefaults boolForKey:@"isSportStop"]) {
+        [self.bmkLocationService stopUserLocationService];
+        [self.bmkLocationService startUserLocationService];
 //        [countTimeTimer setFireDate:[NSDate distantFuture]];
 //        [countTimeTimer setFireDate:[NSDate distantPast]];
 //        [saveDataPer3MinTimer setFireDate:[NSDate distantFuture]];
@@ -1509,7 +1515,7 @@
 //        [_locationManager startUpdatingLocation];
     }
 }
-*/
+
 
 #pragma mark - Life Cycle
 - (void)viewDidLoad {

@@ -38,6 +38,14 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    if ([launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey]) {
+        
+        if ( [_locationManager respondsToSelector:@selector(requestAlwaysAuthorization)] )
+        {
+            [_locationManager requestAlwaysAuthorization];
+        }
+    }
     // Override point for customization after application launch.
     self.userDefaults = [NSUserDefaults standardUserDefaults];
     if (![self.userDefaults boolForKey:@"everLaunched"]) {
@@ -108,6 +116,7 @@
 //        }
 //        [self backgroundHandler];
     }
+//    NSLog(@"程序后台剩余时间：%f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
