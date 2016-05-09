@@ -27,13 +27,12 @@
 /** 讯飞语音 */
 #import "iflyMSC/IFlyMSC.h"
 
-@interface AppDelegate () <BMKGeneralDelegate>
+@interface AppDelegate () <BMKGeneralDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic, strong) BMKMapManager *mapManager;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
 
-
-
+@property (nonatomic, strong) CLLocationManager *locationManager;
 @end
 
 @implementation AppDelegate
@@ -107,7 +106,7 @@
 //        {
 //            NSLog(@"backgrounding accepted");
 //        }
-        [self backgroundHandler];
+//        [self backgroundHandler];
     }
 }
 
@@ -179,26 +178,26 @@
 }
 
 #pragma mark - 百度地图后台调用方法
-- (void)backgroundHandler
-{
-    NSLog(@"### -->backgroundinghandler");
-    UIApplication* app = [UIApplication sharedApplication];
-    self.bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
-        [app endBackgroundTask:self.bgTask];
-        self.bgTask = UIBackgroundTaskInvalid;
-    }];
-    // Start the long-running task
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        // 您想做的事情,
-        // 比如我这里是发送广播, 重新激活定位
-        // 取得ios系统唯一的全局的广播站 通知中心
-        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-        //将内容封装到广播中 给ios系统发送广播
-        // LocationTheme频道
-        if ([self.userDefaults boolForKey:@"isSport"]) {
-            [nc postNotificationName:@"LocationTheme" object:self userInfo:nil];
-        }
-    });
-}
+//- (void)backgroundHandler
+//{
+//    NSLog(@"### -->backgroundinghandler");
+//    UIApplication* app = [UIApplication sharedApplication];
+//    self.bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
+//        [app endBackgroundTask:self.bgTask];
+//        self.bgTask = UIBackgroundTaskInvalid;
+//    }];
+//    // Start the long-running task
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//        // 您想做的事情,
+//        // 比如我这里是发送广播, 重新激活定位
+//        // 取得ios系统唯一的全局的广播站 通知中心
+//        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+//        //将内容封装到广播中 给ios系统发送广播
+//        // LocationTheme频道
+//        if ([self.userDefaults boolForKey:@"isSport"]) {
+//            [nc postNotificationName:@"LocationTheme" object:self userInfo:nil];
+//        }
+//    });
+//}
 
 @end

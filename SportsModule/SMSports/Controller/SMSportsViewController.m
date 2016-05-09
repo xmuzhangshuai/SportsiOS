@@ -72,7 +72,7 @@
 
 #define CONTINUEBUTTON_CENTER_Y 0.725*SCREEN_HEIGHT
 
-@interface SMSportsViewController() <BMKMapViewDelegate, BMKLocationServiceDelegate, UIAlertViewDelegate, IFlySpeechSynthesizerDelegate>
+@interface SMSportsViewController() <BMKMapViewDelegate, BMKLocationServiceDelegate, UIAlertViewDelegate, IFlySpeechSynthesizerDelegate, CLLocationManagerDelegate>
 
 /** 上一次的位置 */
 @property (nonatomic, strong) CLLocation *preLocation;
@@ -102,6 +102,8 @@
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
 
 @property (nonatomic, assign) NSUInteger missPointCount;    // 定位失效次数
+
+@property (nonatomic, strong) CLLocationManager *locationManager;
 
 @end
 
@@ -603,7 +605,7 @@
     self.polyLine = [[BMKPolyline alloc] init];
         //运动中的的状态，需要绘制出先前的路线
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(activeLocation:) name:@"LocationTheme" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(activeLocation:) name:@"LocationTheme" object:nil];
 }
 
 #pragma mark - 百度地图代理
@@ -612,6 +614,7 @@
  *  用户改变位置调用
  **/
 - (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation {
+    NSLog(@"定位");
 //    NSLog(@"定位点%@", userLocation.location);
 //    NSLog(@"水平偏移：%f  竖直偏移：%f", userLocation.location.verticalAccuracy, userLocation.location.horizontalAccuracy);
     if (userLocation.location.horizontalAccuracy > 30 && !isContinue) {
@@ -1469,6 +1472,7 @@
 /**
  *  后台调用方法
  **/
+/*
 - (void) activeLocation:(NSNotification *)notify
 {
 //    [self.bmkLocationService stopUserLocationService];
@@ -1478,14 +1482,34 @@
     //启动LocationService
     NSLog(@"收到通知");
     if ([self.userDefaults boolForKey:@"isSport"]) {
-        [self.bmkLocationService startUserLocationService];
-        [countTimeTimer setFireDate:[NSDate distantFuture]];
-        [countTimeTimer setFireDate:[NSDate distantPast]];
-        [saveDataPer3MinTimer setFireDate:[NSDate distantFuture]];
-        [saveDataPer3MinTimer setFireDate:[NSDate distantPast]];
+//        [self.bmkLocationService startUserLocationService];
+//        [countTimeTimer setFireDate:[NSDate distantFuture]];
+//        [countTimeTimer setFireDate:[NSDate distantPast]];
+//        [saveDataPer3MinTimer setFireDate:[NSDate distantFuture]];
+//        [saveDataPer3MinTimer setFireDate:[NSDate distantPast]];
+        // 1. 实例化定位管理器
+//        _locationManager = [[CLLocationManager alloc] init];
+//        // 2. 设置代理
+//        _locationManager.delegate = self;
+//        // 3. 定位精度
+//        [_locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
+//        // 4.请求用户权限：分为：只在前台开启定位和在后台也可定位，
+//        // iOS8后要手动请求
+//        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8) {
+//            [_locationManager requestAlwaysAuthorization];//在后台也可定位
+//        }
+        // 5.iOS9新特性：将允许出现这种场景：同一app中多个location manager：一些只能在前台定位，另一些可在后台定位（并可随时禁止其后台定位）。
+//        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9) {
+//            if([self.bmkLocationService respondsToSelector:@selector(allowsBackgroundLocationUpdates)]){
+//                [self.bmkLocationService setAllowsBackgroundLocationUpdates:YES];
+//                NSLog(@"设置为yes");
+//            }
+//        }
+        // 6. 更新用户位置
+//        [_locationManager startUpdatingLocation];
     }
 }
-
+*/
 
 #pragma mark - Life Cycle
 - (void)viewDidLoad {
@@ -1497,6 +1521,12 @@
             //定位功能可用，开始定位
             self.mapView = [[BMKMapView alloc] initWithFrame:self.view.bounds];
             self.bmkLocationService = [[BMKLocationService alloc] init];
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9) {
+                if([self.bmkLocationService respondsToSelector:@selector(allowsBackgroundLocationUpdates)]){
+                    [self.bmkLocationService setAllowsBackgroundLocationUpdates:YES];
+                    NSLog(@"设置为yes");
+                }
+            }
             [self UILayout];
             [self BMKMapViewInit];
             [self sportDataInit];

@@ -8,7 +8,7 @@
 		<string>location</string>
 	</array>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string></string>
+	<string>请求后台定位权限</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.xxn.SportsModule</string>
 	<key>CFBundleDisplayName</key>
