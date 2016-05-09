@@ -1065,6 +1065,8 @@
                 countTimeTimer = nil;
                 [saveDataPer3MinTimer invalidate];
                 saveDataPer3MinTimer = nil;
+                [resetTimer invalidate];
+                resetTimer = nil;
                 
                 _iFlySpeechSynthesizer = nil;
                 _iFlySpeechSynthesizer.delegate = nil;
