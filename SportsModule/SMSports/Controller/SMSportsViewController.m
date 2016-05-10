@@ -140,6 +140,7 @@
     BOOL        isPause;                // 记录是否暂停
     BOOL        isContinue;             // 记录是否继续
     BOOL        isStopMenu;             // 判断暂停界面是否显示
+    BOOL        isSwitchPause;          // 是否切换开始/暂停
     
     NSDate      *startTime;             // 开始时间
     NSDate      *endTime;               // 结束时间
@@ -203,6 +204,7 @@
         isGoon              = NO;
         currentMinute       = -1;
         self.missPointCount = 0;
+        isSwitchPause       = NO;
         
         self.userDefaults   = [NSUserDefaults standardUserDefaults];
         self.myAppDelegate  = [[UIApplication sharedApplication] delegate];
@@ -248,6 +250,7 @@
         isGoon              = NO;
         currentMinute       = -1;
         self.missPointCount = 0;
+        isSwitchPause       = NO;
         
         self.userDefaults   = [NSUserDefaults standardUserDefaults];
         
@@ -528,6 +531,7 @@
             }
         }
         isPause = YES;
+        isSwitchPause = YES;
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"isSportStop"];
         isGoon = YES;
         [self.polyLine setPolylineWithPoints:tempPoints count:count textureIndex:self.colorIndex];
@@ -617,17 +621,18 @@
  *  用户改变位置调用
  **/
 - (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation {
-    NSLog(@"定位");
 //    NSLog(@"定位点%@", userLocation.location);
 //    NSLog(@"水平偏移：%f  竖直偏移：%f", userLocation.location.verticalAccuracy, userLocation.location.horizontalAccuracy);
-    if (userLocation.location.horizontalAccuracy > 30 && !isContinue) {
-        self.missPointCount++;
-        if (self.missPointCount > 2 && globalAlertView == nil) {
-            globalAlertView = [[UIAlertView alloc] initWithTitle:@"" message:@"请移步到户外空旷处，以免运动定位不准确" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
-            globalAlertView.tag = 20;
-            [globalAlertView show];
+    if (!isSwitchPause) {
+        if (userLocation.location.horizontalAccuracy > 30 && !isContinue) {
+            self.missPointCount++;
+            if (self.missPointCount > 2 && globalAlertView == nil) {
+                globalAlertView = [[UIAlertView alloc] initWithTitle:@"" message:@"请移步到户外空旷处，以免运动定位不准确" delegate:self cancelButtonTitle:@"好的" otherButtonTitles:nil, nil];
+                globalAlertView.tag = 20;
+                [globalAlertView show];
+            }
+            return;
         }
-        return;
     }
     self.missPointCount = 0;
     self.mapView.showsUserLocation = YES;
@@ -994,14 +999,15 @@
 // 暂停运动 显示暂停菜单
 - (void)stopSport {
     stopCount ++;
-    if (!isPause) {
+    if (!isSwitchPause) {
 //        [self showStopMenu];
         [countTimeTimer setFireDate:[NSDate distantFuture]];
         [switchButton setImage:[UIImage imageNamed:@"开始图标"] forState:UIControlStateNormal];
         // 关闭定位
         [self.bmkLocationService stopUserLocationService];
         isPause = YES;
-        
+        isSwitchPause = YES;
+        isContinue = YES;
         // 记录暂停时间点
         stopTime = [NSDate date];
         
@@ -1040,6 +1046,7 @@
     [countTimeTimer setFireDate:[NSDate distantPast]];
     isContinue = YES;
 //    isPause = NO;
+    isSwitchPause = NO;
     // 计算当前时间与暂停时时间相差多少毫秒
     pauseTime += [[NSDate date] timeIntervalSinceDate:stopTime]*1000;
 }
@@ -1176,6 +1183,7 @@
     self.navigationItem.rightBarButtonItem.enabled = YES;
     isBegin             = NO;
     isPause             = NO;
+    isSwitchPause       = NO;
     [self.userDefaults setBool:NO forKey:@"isSportStop"];
     isContinue          = YES;
     isStopMenu          = NO;
