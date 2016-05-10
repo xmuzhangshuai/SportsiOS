@@ -623,6 +623,9 @@
 - (void)didUpdateBMKUserLocation:(BMKUserLocation *)userLocation {
 //    NSLog(@"定位点%@", userLocation.location);
 //    NSLog(@"水平偏移：%f  竖直偏移：%f", userLocation.location.verticalAccuracy, userLocation.location.horizontalAccuracy);
+//    if ([self.userDefaults boolForKey:@"isSportStop"]) {
+//        return;
+//    }
     if (!isSwitchPause) {
         if (userLocation.location.horizontalAccuracy > 30 && !isContinue) {
             self.missPointCount++;
@@ -653,6 +656,7 @@
         isContinue = NO;
         if ([self.userDefaults boolForKey:@"isSportStop"]) {
             isPause = NO;
+            isSwitchPause = NO;
             [self stopSport];
         }
         if (!isBegin && ![self.userDefaults boolForKey:@"isSport"]) {
@@ -673,7 +677,9 @@
     }else {
         NSString *temp = [motionTrack stringByAppendingString:[NSString stringWithFormat:@"Lon%fLat%f;", userLocation.location.coordinate.longitude, userLocation.location.coordinate.latitude]];
         motionTrack = temp;
-        [self TrailRouteWithUserLocation:userLocation];
+        if (![self.userDefaults boolForKey:@"isSportStop"]) {
+            [self TrailRouteWithUserLocation:userLocation];
+        }
     }
 }
 
@@ -773,6 +779,7 @@
         if (isPause) {
             [self.colorIndex addObject:[NSNumber numberWithInt:0]];
             isPause = NO;
+            isSwitchPause = NO;
             [self.userDefaults setBool:NO forKey:@"isSportStop"];
         }else {
             [self.colorIndex addObject:[NSNumber numberWithInt:1]];
@@ -780,6 +787,7 @@
     }
     if (isPause) {
         isPause = NO;
+        isSwitchPause = NO;
     }
 //    if ([self.userDefaults boolForKey:@"isSportStop"]) {
 //        [self.locationArray removeObjectAtIndex:self.locationArray.count-1];
@@ -1540,7 +1548,6 @@
             if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9) {
                 if([self.bmkLocationService respondsToSelector:@selector(allowsBackgroundLocationUpdates)]){
                     [self.bmkLocationService setAllowsBackgroundLocationUpdates:YES];
-                    NSLog(@"设置为yes");
                 }
             }
             [self UILayout];
